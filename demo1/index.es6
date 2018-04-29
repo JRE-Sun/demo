@@ -2,11 +2,14 @@
  * 封装一个页面加载类
  */
 class Progress {
+
     /**
      *
-     * @param ele 元素id
-     * @param speed 增长速度范围
-     * @param endPosition 最终停在那个位置
+     * @param ele 元素id (必填)
+     * @param loading 在加载过程中触发
+     * @param speedArray 增长速度范围
+     * @param onLoad 当加载完成触发onLoad
+     * @param endPositionArray 最终停在位置范围
      */
     constructor({ele = null, loading = null, speedArray = [1, 3], onLoad = null, endPositionArray = [80, 90]} = {}) {
         if (ele == null) {
