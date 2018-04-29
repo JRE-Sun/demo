@@ -15,23 +15,38 @@ var Progress = function () {
      * @param endPosition 最终停在那个位置
      */
     function Progress() {
-        var eleId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-        var speedArray = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [1, 3];
-        var endPositionArray = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [80, 90];
+        var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+            _ref$ele = _ref.ele,
+            ele = _ref$ele === undefined ? null : _ref$ele,
+            _ref$loading = _ref.loading,
+            loading = _ref$loading === undefined ? null : _ref$loading,
+            _ref$speedArray = _ref.speedArray,
+            speedArray = _ref$speedArray === undefined ? [1, 3] : _ref$speedArray,
+            _ref$onLoad = _ref.onLoad,
+            onLoad = _ref$onLoad === undefined ? null : _ref$onLoad,
+            _ref$endPositionArray = _ref.endPositionArray,
+            endPositionArray = _ref$endPositionArray === undefined ? [80, 90] : _ref$endPositionArray;
 
         _classCallCheck(this, Progress);
 
-        if (eleId == null) {
-            console.log('eleId为必填参数');
+        if (ele == null) {
+            console.log('ele为必填参数');
             return;
         }
-        this.ele = document.querySelector('#' + eleId);
+        this.onLoadCallBack = this.isFunction(onLoad);
+        this.LoadingCallBack = this.isFunction(loading);
+        this.ele = document.querySelector('#' + ele);
         this.speedArray = speedArray;
         this.endPosition = this.getRandomNumBy(endPositionArray[0], endPositionArray[1]);
         this.init();
     }
 
     _createClass(Progress, [{
+        key: 'isFunction',
+        value: function isFunction(val) {
+            return val && val != null && typeof val == 'function' ? val : false;
+        }
+    }, {
         key: 'init',
         value: function init() {
             this.imgArray = document.querySelectorAll('img');
@@ -65,7 +80,7 @@ var Progress = function () {
                     if (imgLoadIndex > imgLoadIndex) {
                         return;
                     }
-                    _this.currIndex = _this.currIndex + Math.ceil(imgLoadIndex / imgLength * _this.endPosition);
+                    _this.currIndex = _this.currIndex * 1 + Math.ceil(imgLoadIndex / imgLength * _this.endPosition) * 1;
                 };
             });
         }
@@ -115,9 +130,10 @@ var Progress = function () {
                 _this3.index = _this3.currIndex;
                 if (endPosition <= _this3.index) {
                     _this3.downPart(endPosition);
-                    return;
+                } else {
+                    _this3.upPart(tempTime, endPosition);
                 }
-                _this3.upPart(tempTime, endPosition);
+                _this3.LoadingCallBack && _this3.LoadingCallBack(_this3.index);
             }, time);
         }
 
@@ -134,6 +150,7 @@ var Progress = function () {
             this.ele.style.cssText = "width:" + this.index + "%";
             clearTimeout(this.timer);
             if (this.isLoadInit) {
+                this.onLoadCallBack && this.onLoadCallBack();
                 setTimeout(function () {
                     _this4.ele.classList.add("progress-hide");
                 }, 500);
@@ -167,11 +184,21 @@ var Progress = function () {
         key: 'getRandomNumBy',
         value: function getRandomNumBy(start, end) {
             // 注意向上取整
-            return Math.ceil(Math.random() * (end - start) + start);
+            return Math.ceil(Math.random() * (end - start) * 1 + start * 1);
         }
     }]);
 
     return Progress;
 }();
 
-new Progress('progress', [1, 5], [75, 95]);
+new Progress({
+    ele: 'progress',
+    speedArray: [1, 5],
+    endPositionArray: [75, 95],
+    loading: function loading(index) {
+        console.log(index);
+    },
+    onLoad: function onLoad() {
+        console.log('load already');
+    }
+});

@@ -8,15 +8,21 @@ class Progress {
      * @param speed 增长速度范围
      * @param endPosition 最终停在那个位置
      */
-    constructor(eleId = null, speedArray = [1, 3], endPositionArray = [80, 90]) {
-        if (eleId == null) {
-            console.log('eleId为必填参数');
+    constructor({ele = null, loading = null, speedArray = [1, 3], onLoad = null, endPositionArray = [80, 90]} = {}) {
+        if (ele == null) {
+            console.log('ele为必填参数');
             return;
         }
-        this.ele         = document.querySelector(`#${eleId}`);
-        this.speedArray  = speedArray;
-        this.endPosition = this.getRandomNumBy(endPositionArray[0], endPositionArray[1]);
+        this.onLoadCallBack  = this.isFunction(onLoad);
+        this.LoadingCallBack = this.isFunction(loading);
+        this.ele             = document.querySelector(`#${ele}`);
+        this.speedArray      = speedArray;
+        this.endPosition     = this.getRandomNumBy(endPositionArray[0], endPositionArray[1]);
         this.init();
+    }
+
+    isFunction(val) {
+        return val && val != null && typeof val == 'function' ? val : false;
     }
 
     init() {
@@ -46,7 +52,7 @@ class Progress {
                 if (imgLoadIndex > imgLoadIndex) {
                     return;
                 }
-                this.currIndex = this.currIndex + Math.ceil((imgLoadIndex / imgLength) * this.endPosition);
+                this.currIndex = this.currIndex * 1 + Math.ceil((imgLoadIndex / imgLength) * this.endPosition) * 1;
             }
         })
     }
@@ -85,9 +91,10 @@ class Progress {
             this.index = this.currIndex;
             if (endPosition <= this.index) {
                 this.downPart(endPosition);
-                return;
+            } else {
+                this.upPart(tempTime, endPosition);
             }
-            this.upPart(tempTime, endPosition);
+            this.LoadingCallBack && this.LoadingCallBack(this.index);
         }, time);
     }
 
@@ -99,6 +106,7 @@ class Progress {
         this.ele.style.cssText = "width:" + this.index + "%";
         clearTimeout(this.timer);
         if (this.isLoadInit) {
+            this.onLoadCallBack && this.onLoadCallBack();
             setTimeout(() => {
                 this.ele.classList.add("progress-hide");
             }, 500)
@@ -127,10 +135,20 @@ class Progress {
      */
     getRandomNumBy(start, end) {
         // 注意向上取整
-        return Math.ceil(Math.random() * (end - start) + start);
+        return Math.ceil(Math.random() * (end - start) * 1 + start * 1);
     }
 
 }
 
-new Progress('progress', [1, 5], [75, 95]);
+new Progress({
+    ele             : 'progress',
+    speedArray      : [1, 5],
+    endPositionArray: [75, 95],
+    loading         : (index) => {
+        console.log(index);
+    },
+    onLoad          : () => {
+        console.log('load already');
+    }
+});
 
