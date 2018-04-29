@@ -4,7 +4,8 @@
 class Progress {
 
     /**
-     *
+     * @param init 初始化时候的会掉
+     * @param maxLoadingTime 最大等待loading时间
      * @param loading 在加载过程中触发
      * @param speedArray 增长速度范围
      * @param onLoad 当加载完成触发onLoad
