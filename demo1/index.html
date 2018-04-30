@@ -31,11 +31,27 @@
         .progress-hide {
             opacity: 0;
         }
+
+        .time-graph {
+            padding-top: 20px;
+            display: flex;
+            display: -webkit-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #myCanvas {
+            width: 90px;
+            height: 90px;
+        }
     </style>
 </head>
 <body>
 <div class="loading" id="loading">
     <div class="progress" id="progress"></div>
+</div>
+<div class="time-graph">
+    <canvas id="myCanvas" width="180" height="180"></canvas>
 </div>
 <img src="https://ss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=4136376869,3527986770&fm=58&bpow=484&bpoh=473" alt="">
 <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1524919127094&di=685b3c443e3903f848ff67941b8a3183&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F010f2a5944bc9ba8012193a3190f53.jpg%402o.jpg"
