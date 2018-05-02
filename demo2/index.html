@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>canvas抽奖转盘</title>
+    <style>
+        #canvas {
+            height: 200px;
+            width: 200px;
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="400" height="400"></canvas>
+<script>
+    var num    = 6;   // 奖品数量
+    var canvas = document.getElementById('canvas');
+    if (!canvas.getContext) {
+        alert('抱歉！浏览器不支持。');
+    }
+    // canvas开始绘图
+    var ctx = canvas.getContext('2d');
+    ctx.beginPath();
+    // 位移到圆心，下面需要围绕圆心旋转
+    ctx.translate(200, 200);
+    ctx.arc(0, 0, 200, 2 * Math.PI, 0);
+    ctx.stroke();
+    for (var i = 0; i < num; i++) {
+        // 保存当前状态
+        ctx.save();
+        // 开始一条新路径
+        ctx.beginPath();
+        // 从(0, 0)坐标开始定义一条新的子路径
+        ctx.moveTo(0, 0);
+        // 旋转弧度,需将角度转换为弧度,使用 degrees * Math.PI/180 公式进行计算。
+        ctx.rotate((360 / num * i + 360 / num / 2) * Math.PI / 180);
+        // 绘制圆弧
+        ctx.arc(0, 0, 200, 0, 2 * Math.PI / num, false);
+        if (i % 2 == 0) {
+            ctx.fillStyle = '#b0e0e6';
+        } else {
+            ctx.fillStyle = '#e4c6d0';
+        }
+        // 填充扇形
+        ctx.fill();
+        // 绘制边框
+        ctx.lineWidth   = 0.5;
+        ctx.strokeStyle = '#b0e0e6';
+        ctx.stroke();
+
+        // 文字
+        ctx.fillStyle = '#fff';
+        ctx.font      = "18px sans-serif";
+        if (i == 0) {
+            ctx.fillText('六元红包', 55, 55);
+        }
+        if (i == 1) {
+            ctx.fillText('没红包', 47, 50);
+        }
+        if (i == 2) {
+            ctx.fillText('流量大赠送', 40, 47);
+        }
+        if (i == 3) {
+            ctx.fillText('谢谢惠顾', 55, 55);
+        }
+        if (i == 4) {
+            ctx.fillText('送个人给你', 40, 47);
+        }
+        if (i == 5) {
+            ctx.fillText('啥玩意', 55, 55);
+        }
+
+        // 恢复前一个状态
+        ctx.restore();
+    }
+    // js实现匀速转动5圈，随后加速，再减速
+    setTimeout(function () {
+        canvas.style.cssText = 'transition:all 6s ease-out;transform:rotate(2780deg);';
+    }, (Math.random() + 2) * 1000);
+</script>
+</body>
+</html>

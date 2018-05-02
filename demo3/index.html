@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>轮播</title>
+    <style>
+        .active-entrance {
+            overflow: hidden;
+        }
+
+        .swiper-wrapper {
+            display: flex;
+            transition: .4s;
+        }
+
+        .entrance-slide {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<div class="active-entrance">
+    <div class="entrance-title weui-flex vertical">
+        <img src="{CDN}v1/img/activity-entrance-img.png" alt="">
+        <span class="weui-flex__item">优惠活动</span>
+    </div>
+    <div class="swiper-wrapper">
+        <a class="swiper-slide entrance-slide" href="/0731cs/g/65pvxyo85g/">
+            <div class="entrance-right">
+                <div class="entrance-main">
+                    <p>1元购买当地特产</p>
+                    <span>葫芦娃</span>
+                    <div class="entrance-price-wrap">
+                        <span>￥1</span>
+                        <del>￥50</del>
+                    </div>
+                </div>
+            </div>
+            <img class="left-img" src="/static/v1/img/icon-shop.png" alt="哈哈哈">
+        </a>
+        <a class="swiper-slide entrance-slide" href="/0731cs/g/65pvxyo85g/">
+            <div class="entrance-right">
+                <div class="entrance-main">
+                    <p>2元购买当地特产</p>
+                    <span>葫芦娃</span>
+                    <div class="entrance-price-wrap">
+                        <span>￥1</span>
+                        <del>￥50</del>
+                    </div>
+                </div>
+            </div>
+            <img class="left-img" src="/static/v1/img/icon-shop.png" alt="哈哈哈">
+        </a>
+        <a class="swiper-slide entrance-slide" href="/0731cs/g/65pvxyo85g/">
+            <div class="entrance-right">
+                <div class="entrance-main">
+                    <p>3元购买当地特产</p>
+                    <span>葫芦娃</span>
+                    <div class="entrance-price-wrap">
+                        <span>￥1</span>
+                        <del>￥50</del>
+                    </div>
+                </div>
+            </div>
+            <img class="left-img" src="/static/v1/img/icon-shop.png" alt="哈哈哈">
+        </a>
+    </div>
+</div>
+<script src="../lib/zepto.js"></script>
+<script src="zepto.carousel.js"></script>
+<script src="index.js"></script>
+</body>
+</html>
