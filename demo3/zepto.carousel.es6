@@ -59,6 +59,30 @@ class Carousel {
         this.bindEvent();
     }
 
+    wheel(e) {
+        e = e || window.event;
+        // 判断默认行为是否可以被禁用
+        if (event.cancelable) {
+            // 判断默认行为是否已经被禁用
+            if (!event.defaultPrevented) {
+                event.preventDefault();
+            }
+        }
+        if (e.preventDefault)
+            e.preventDefault();
+        e.returnValue = false;
+    }
+
+    disableTouchMove() {
+        $(document).on('touchmove', this.wheel);
+        $(window).on('touchmove', this.wheel);
+    }
+
+    enableTouchMove() {
+        $(window).off('touchmove', this.wheel);
+        $(document).off('touchmove', this.wheel);
+    }
+
     move(index, callback = null) {
         this.parentEle.off('transitionend');
         this.parentEle.off('webkitTransitionEnd');
@@ -84,15 +108,12 @@ class Carousel {
 
     loopMove() {
         if (this.loop) {
-            console.log(6, this.startIndex == this.childLength - 2, this.direction == 'right');
             // 向右到达最后
             if (this.startIndex == this.childLength - 2 && this.direction == 'right') {
-                console.log(1);
                 this.startIndex = 0;
             }
             // 向左到达最前
             if (this.startIndex == 0 && this.direction == 'left') {
-                console.log(2);
                 this.startIndex = this.childLength - 2;
             }
             this.currPosition = (this.childEleWidth * this.startIndex) * -1;
@@ -113,13 +134,15 @@ class Carousel {
             startIndex      = 0,
             transitionTime  = this.transitionTime;
         this.parentEle.on('touchstart', (e) => {
+            this.disableTouchMove();
+            this.setTransitionTime('0s');
             clearInterval(this.timer);
             this.timer = null;
-            this.setTransitionTime('0s');
             this.loopMove();
             startPosition.x = e.changedTouches[0].pageX;
         });
         this.parentEle.on('touchmove', (e) => {
+            console.log(1);
             endPosition.x   = e.changedTouches[0].pageX;
             moveDistance    = Math.ceil(endPosition.x - startPosition.x);
             absMoveDistance = Math.abs(moveDistance);
@@ -129,6 +152,7 @@ class Carousel {
             this.move(this.currPosition * 1 + moveDistance * 1);
         });
         this.parentEle.on('touchend', () => {
+            this.enableTouchMove();
             this.setTransitionTime(transitionTime);
             this.direction = direction = this.getDirection(startPosition, endPosition);
             startIndex = this.startIndex;

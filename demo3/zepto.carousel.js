@@ -84,6 +84,32 @@ var Carousel = function () {
             this.bindEvent();
         }
     }, {
+        key: 'wheel',
+        value: function wheel(e) {
+            e = e || window.event;
+            // 判断默认行为是否可以被禁用
+            if (event.cancelable) {
+                // 判断默认行为是否已经被禁用
+                if (!event.defaultPrevented) {
+                    event.preventDefault();
+                }
+            }
+            if (e.preventDefault) e.preventDefault();
+            e.returnValue = false;
+        }
+    }, {
+        key: 'disableTouchMove',
+        value: function disableTouchMove() {
+            $(document).on('touchmove', this.wheel);
+            $(window).on('touchmove', this.wheel);
+        }
+    }, {
+        key: 'enableTouchMove',
+        value: function enableTouchMove() {
+            $(window).off('touchmove', this.wheel);
+            $(document).off('touchmove', this.wheel);
+        }
+    }, {
         key: 'move',
         value: function move(index) {
             var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -116,15 +142,12 @@ var Carousel = function () {
             var _this2 = this;
 
             if (this.loop) {
-                console.log(6, this.startIndex == this.childLength - 2, this.direction == 'right');
                 // 向右到达最后
                 if (this.startIndex == this.childLength - 2 && this.direction == 'right') {
-                    console.log(1);
                     this.startIndex = 0;
                 }
                 // 向左到达最前
                 if (this.startIndex == 0 && this.direction == 'left') {
-                    console.log(2);
                     this.startIndex = this.childLength - 2;
                 }
                 this.currPosition = this.childEleWidth * this.startIndex * -1;
@@ -148,13 +171,15 @@ var Carousel = function () {
                 startIndex = 0,
                 transitionTime = this.transitionTime;
             this.parentEle.on('touchstart', function (e) {
+                _this3.disableTouchMove();
+                _this3.setTransitionTime('0s');
                 clearInterval(_this3.timer);
                 _this3.timer = null;
-                _this3.setTransitionTime('0s');
                 _this3.loopMove();
                 startPosition.x = e.changedTouches[0].pageX;
             });
             this.parentEle.on('touchmove', function (e) {
+                console.log(1);
                 endPosition.x = e.changedTouches[0].pageX;
                 moveDistance = Math.ceil(endPosition.x - startPosition.x);
                 absMoveDistance = Math.abs(moveDistance);
@@ -164,6 +189,7 @@ var Carousel = function () {
                 _this3.move(_this3.currPosition * 1 + moveDistance * 1);
             });
             this.parentEle.on('touchend', function () {
+                _this3.enableTouchMove();
                 _this3.setTransitionTime(transitionTime);
                 _this3.direction = direction = _this3.getDirection(startPosition, endPosition);
                 startIndex = _this3.startIndex;
