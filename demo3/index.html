@@ -7,36 +7,65 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>轮播</title>
     <style>
-        .active-entrance {
-            overflow: hidden;
+        * {
+            padding: 0;
+            margin: 0;
         }
 
-        .swiper-wrapper {
+        .swiper0, .swiper1, .swiper2 {
             display: flex;
             transition: .4s;
+            background-color: rgba(0, 0, 0, .8);
+            margin-bottom: 30px;
         }
 
-        .entrance-slide {
-            display: inline-block;
+        .slide0 img, .slide1 img, .slide2 img {
+            width: 100%;
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
         }
     </style>
 </head>
 <body>
-<div class="active-entrance">
-    <div class="swiper-wrapper">
-        <a class="swiper-slide entrance-slide" href="/0731cs/g/65pvxyo85g/">
-            <img src="http://pic.people.com.cn/NMediaFile/2018/0502/MAIN201805021528000542544420820.jpg" alt="">
-        </a>
-        <a class="swiper-slide entrance-slide" href="/0731cs/g/65pvxyo85g/">
-            <img src="http://pic.people.com.cn/NMediaFile/2018/0502/MAIN201805021528000542544420820.jpg" alt="">
-        </a>
-        <a class="swiper-slide entrance-slide" href="/0731cs/g/65pvxyo85g/">
-            <img src="http://pic.people.com.cn/NMediaFile/2018/0502/MAIN201805021528000542544420820.jpg" alt="">
-        </a>
-        <a class="swiper-slide entrance-slide" href="/0731cs/g/65pvxyo85g/">
-            <img src="http://pic.people.com.cn/NMediaFile/2018/0502/MAIN201805021528000542544420820.jpg" alt="">
-        </a>
+
+<div class="swiper0">
+    <div class="slide0">
+        <img src="http://streetwill.co/uploads/post/photo/738/show_kFs0yo9h0DOhyKKeeRhI6WDhnSuzw8KrcQ59G1iz_pg.jpg"
+             alt="">
     </div>
+    <div class="slide0">
+        <img src="http://streetwill.co/uploads/post/photo/659/show_RWAy4NXsFyKffsrD6uLliS-d78nrC90zXJtmkZ_aV3g.jpg"
+             alt=""></div>
+    <div class="slide0">
+        <img src="http://streetwill.co/uploads/post/photo/712/show_J4bkRVj48GNacMELdZMj4IkUNO1YFsFlgkcMpmU8qqA.JPG"
+             alt=""></div>
+</div>
+
+<div class="swiper1">
+    <div class="slide1">
+        <img src="http://streetwill.co/uploads/post/photo/738/show_kFs0yo9h0DOhyKKeeRhI6WDhnSuzw8KrcQ59G1iz_pg.jpg"
+             alt="">
+    </div>
+    <div class="slide1">
+        <img src="http://streetwill.co/uploads/post/photo/659/show_RWAy4NXsFyKffsrD6uLliS-d78nrC90zXJtmkZ_aV3g.jpg"
+             alt=""></div>
+    <div class="slide1">
+        <img src="http://streetwill.co/uploads/post/photo/712/show_J4bkRVj48GNacMELdZMj4IkUNO1YFsFlgkcMpmU8qqA.JPG"
+             alt=""></div>
+</div>
+
+<div class="swiper2">
+    <div class="slide2">
+        <img src="http://streetwill.co/uploads/post/photo/738/show_kFs0yo9h0DOhyKKeeRhI6WDhnSuzw8KrcQ59G1iz_pg.jpg"
+             alt="">
+    </div>
+    <div class="slide2">
+        <img src="http://streetwill.co/uploads/post/photo/659/show_RWAy4NXsFyKffsrD6uLliS-d78nrC90zXJtmkZ_aV3g.jpg"
+             alt=""></div>
+    <div class="slide2">
+        <img src="http://streetwill.co/uploads/post/photo/712/show_J4bkRVj48GNacMELdZMj4IkUNO1YFsFlgkcMpmU8qqA.JPG"
+             alt=""></div>
 </div>
 <script src="../lib/zepto.js"></script>
 <script src="zepto.carousel.js"></script>
