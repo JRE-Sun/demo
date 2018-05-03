@@ -179,7 +179,6 @@ var Carousel = function () {
                 startPosition.x = e.changedTouches[0].pageX;
             });
             this.parentEle.on('touchmove', function (e) {
-                console.log(1);
                 endPosition.x = e.changedTouches[0].pageX;
                 moveDistance = Math.ceil(endPosition.x - startPosition.x);
                 absMoveDistance = Math.abs(moveDistance);
