@@ -62,7 +62,7 @@ var Carousel = function () {
         this.loop = loop;
         this.initCallBack = init && typeof init == 'function' ? init : function () {};
         this.changedCallBack = changed && typeof changed == 'function' ? changed : function () {};
-        this.seize = seize > 1 ? 1 : seize;
+        this.seize = seize > 1 || seize < 0 ? 1 : seize;
         this.init();
     }
 
@@ -95,33 +95,40 @@ var Carousel = function () {
                 console.log('没有查询到该元素!');
                 return;
             }
+            this.screenEleNums = Math.ceil(1 / this.seize); // 一屏能够占据几个子元素
             this.arrayAHref = []; // 存储a的href
             this.specialElePrevSucc = false;
             this.childLength = this.childEles.length; // 子元素长度
+            // 当子元素长度小于 首屏能够存放的
+            if (this.childLength < this.screenEleNums) {
+                this.seize = 1;
+                this.screenEleNums = 1;
+            }
             this.direction = 'right'; // 默认移动方向
             this.startIndex = 0; // 初始位置下标
-            this.loopIndex = this.startIndex;
-            this.transitionTime = this.parentEle.css('transition');
-            var strIndex = this.find(this.transitionTime, 's', 0);
-            // 如果没有设置默认缓冲时间,设置成0.4s
-            if (this.transitionTime.substr(strIndex - 1, 1) <= 0) {
-                this.transitionTime = '0.4s';
+            this.transitionTime = this.parentEle.css('transition-duration');
+            this.transitionTime = this.transitionTime.substr(0, this.transitionTime.length - 1);
+            // 如果没有设置默认缓冲时间,设置成0.3s
+            if (this.transitionTime <= 0) {
+                this.transitionTime = '0.3';
                 this.setTransitionTime(this.transitionTime);
             }
             // 当loop为true
             if (this.loop) {
-                this.parentEle.prepend(this.childEles.eq(this.childLength - 1).clone());
-                this.parentEle.append(this.childEles.eq(0).clone());
-                this.startIndex = 1; // 初始位置下标
-                this.childLength = this.childLength + 2; // 总长度+2
+                // 判断屏幕上存放元素
+                for (var i = 0; i < this.screenEleNums; i++) {
+                    this.parentEle.prepend(this.childEles.eq(this.childLength - i - 1).clone());
+                    this.parentEle.append(this.childEles.eq(i).clone());
+                }
+                this.startIndex = this.screenEleNums; // 初始位置下标
+                this.childLength = this.childLength + this.screenEleNums * 2; // 变更总长度
                 this.childEles = $(this.childClass); // 重新获取子元素
             }
             $('img').attr('draggable', 'false');
             $('a').attr('draggable', 'false');
             this.screenWidth = $('body').width(); // 屏幕宽
             this.lineOfPoint = Math.ceil(this.screenWidth * this.movePercent); // 子元素移动多长距离才能滚动到下一个
-            this.childEleWidth = this.screenWidth * this.seize;
-
+            this.childEleWidth = Math.ceil(this.screenWidth * this.seize);
             this.currPosition = this.startIndex * this.childEleWidth * -1; // 初始位置
             this.timer = null; // 自动轮播定时器
             // 获取子元素宽
@@ -133,8 +140,10 @@ var Carousel = function () {
                 width: this.childEleWidth * this.childLength,
                 display: 'flex'
             });
+            // 这里设置好子元素,父元素后->元素长度加上margin值的
+            this.childEleWidth = this.childEleWidth * 1;
             // 这里不能设置为0,否则不会触发回调
-            this.setTransitionTime('0s');
+            this.setTransitionTime('0');
             // 瞬间移动
             this.move({
                 targetPosition: this.currPosition,
@@ -147,6 +156,17 @@ var Carousel = function () {
             this.run();
             // 开启事件绑定
             this.bindEvent();
+        }
+    }, {
+        key: 'getEveryMoveDistance',
+        value: function getEveryMoveDistance() {
+            return;
+        }
+    }, {
+        key: 'removePx',
+        value: function removePx(val) {
+            var length = val.length;
+            return val.substr(0, length - 2);
         }
 
         /**
@@ -255,12 +275,14 @@ var Carousel = function () {
                 _ref2$callback = _ref2.callback,
                 callback = _ref2$callback === undefined ? null : _ref2$callback,
                 _ref2$time = _ref2.time,
-                time = _ref2$time === undefined ? 400 : _ref2$time;
+                time = _ref2$time === undefined ? this.transitionTime : _ref2$time;
 
             var parentEle = this.parentEle;
-            setTimeout(function () {
-                callback && callback();
-            }, time);
+            if (callback != null) {
+                setTimeout(function () {
+                    callback();
+                }, time * 1000);
+            }
             parentEle.css({
                 transform: 'translateX(' + targetPosition + 'px)'
             });
@@ -269,7 +291,7 @@ var Carousel = function () {
         key: 'setTransitionTime',
         value: function setTransitionTime(time) {
             this.parentEle.css({
-                'transition': '' + time
+                'transition-duration': time + 's'
             });
         }
 
@@ -291,13 +313,10 @@ var Carousel = function () {
             if (!this.loop) {
                 return;
             }
-            // if (this.loopIndex == 1 || this.loopIndex == this.childLength - 2) {
-            //     return;
-            // }
             if (direction == null) {
                 direction = this.direction;
             }
-            this.setTransitionTime('0s');
+            this.setTransitionTime('0');
             var move = function move() {
                 var self = _this2;
                 self.currPosition = self.childEleWidth * self.startIndex * -1;
@@ -313,16 +332,14 @@ var Carousel = function () {
                 });
             };
             // 向右到达最后
-            if (this.startIndex == this.childLength - 1 && direction == 'right') {
-                this.startIndex = 1;
-                this.loopIndex = this.startIndex;
+            if (this.startIndex == this.childLength - this.screenEleNums && direction == 'right') {
+                this.startIndex = this.screenEleNums;
                 move();
                 return;
             }
             // 向左到达最前
             if (this.startIndex == 0 && direction == 'left') {
-                this.startIndex = this.childLength - 2;
-                this.loopIndex = this.startIndex;
+                this.startIndex = this.childLength - 2 * this.screenEleNums;
                 move();
                 return;
             }
@@ -354,10 +371,9 @@ var Carousel = function () {
             var eventStart = function eventStart(e) {
                 // 在左右移动的时候,禁止上下移动
                 _this3.disableTouchMove();
-                _this3.setTransitionTime('0s');
+                _this3.setTransitionTime('0');
                 clearInterval(_this3.timer);
                 _this3.timer = null;
-                _this3.loopMove();
                 if (typeof e.changedTouches == 'undefined') {
                     startPosition.x = e.clientX;
                 } else {
@@ -366,6 +382,7 @@ var Carousel = function () {
             };
 
             var eventMove = function eventMove(e) {
+                _this3.loopMove();
                 if (typeof e.changedTouches == 'undefined') {
                     endPosition.x = e.clientX;
                 } else {
@@ -482,14 +499,14 @@ var Carousel = function () {
                     _this4.startIndex = startIndex >= _this4.childLength ? _this4.childLength - 1 : startIndex;
                     _this4.setTransitionTime(_this4.transitionTime);
                     _this4.currPosition = _this4.childEleWidth * _this4.startIndex * -1;
-                    var self = _this4;
                     // 移动到新的位置
-                    self.move({
+                    _this4.move({
                         targetPosition: _this4.currPosition,
                         callback: function callback() {
-                            self.loopMove({
-                                direction: self.direction == 'left' && self.startIndex == self.childLength - 1 ? 'right' : self.direction
+                            _this4.loopMove({
+                                direction: _this4.direction == 'left' && _this4.startIndex == _this4.childLength - 1 ? 'right' : _this4.direction
                             });
+                            _this4.direction = 'right';
                         }
                     });
                     return;

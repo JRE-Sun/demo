@@ -7,26 +7,40 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>轮播</title>
     <style>
-        html,body{
-            overflow-x:hidden ;
+        html, body {
+            overflow-x: hidden;
         }
+
         * {
             padding: 0;
             margin: 0;
         }
-        .swiper0{
+
+        .swiper0 {
             height: 150px;
         }
+
         a {
             display: block;
             width: 100%;
             height: 100%;
-            color: #fff;
+            /*color: #FFF;*/
+            overflow: hidden;
+            /*margin: 0 10px;*/
         }
 
         .swiper0, .swiper1, .swiper2 {
-            background-color: rgba(0, 0, 0, .8);
+            /*background-color: black;*/
             margin-bottom: 30px;
+            transition: .3s;
+        }
+
+        .slide0 {
+            margin: 0 10px;
+        }
+
+        .slide0 {
+            border: 1px solid red;
         }
 
         .slide0 img, .slide1 img, .slide2 img {
@@ -56,33 +70,58 @@
             333333333333333333
         </a>
     </div>
+    <div class="slide0">
+        <a href="http://www.baidu.com/2">
+            4444444444
+        </a>
+    </div>
+    <div class="slide0">
+        <a href="http://5www.baidu.com/3">
+            555555555
+        </a>
+    </div>
+    <div class="slide0">
+        <a href="http://www.baidu.com/2">
+            66666
+        </a>
+    </div>
+    <div class="slide0">
+        <a href="http://5www.baidu.com/3">
+            77777
+        </a>
+    </div>
+    <div class="slide0">
+        <a href="http://www.baidu.com/2">
+            88888
+        </a>
+    </div>
 </div>
 
-<div class="swiper1">
-    <div class="slide1">
-        <img src="http://streetwill.co/uploads/post/photo/738/show_kFs0yo9h0DOhyKKeeRhI6WDhnSuzw8KrcQ59G1iz_pg.jpg"
-             alt="">
-    </div>
-    <div class="slide1">
-        <img src="http://streetwill.co/uploads/post/photo/659/show_RWAy4NXsFyKffsrD6uLliS-d78nrC90zXJtmkZ_aV3g.jpg"
-             alt=""></div>
-    <div class="slide1">
-        <img src="http://streetwill.co/uploads/post/photo/712/show_J4bkRVj48GNacMELdZMj4IkUNO1YFsFlgkcMpmU8qqA.JPG"
-             alt=""></div>
-</div>
+<!--<div class="swiper1">-->
+<!--<div class="slide1">-->
+<!--<img src="http://streetwill.co/uploads/post/photo/738/show_kFs0yo9h0DOhyKKeeRhI6WDhnSuzw8KrcQ59G1iz_pg.jpg"-->
+<!--alt="">-->
+<!--</div>-->
+<!--<div class="slide1">-->
+<!--<img src="http://streetwill.co/uploads/post/photo/659/show_RWAy4NXsFyKffsrD6uLliS-d78nrC90zXJtmkZ_aV3g.jpg"-->
+<!--alt=""></div>-->
+<!--<div class="slide1">-->
+<!--<img src="http://streetwill.co/uploads/post/photo/712/show_J4bkRVj48GNacMELdZMj4IkUNO1YFsFlgkcMpmU8qqA.JPG"-->
+<!--alt=""></div>-->
+<!--</div>-->
 
-<div class="swiper2">
-    <div class="slide2">
-        <img src="http://streetwill.co/uploads/post/photo/738/show_kFs0yo9h0DOhyKKeeRhI6WDhnSuzw8KrcQ59G1iz_pg.jpg"
-             alt="">
-    </div>
-    <div class="slide2">
-        <img src="http://streetwill.co/uploads/post/photo/659/show_RWAy4NXsFyKffsrD6uLliS-d78nrC90zXJtmkZ_aV3g.jpg"
-             alt=""></div>
-    <div class="slide2">
-        <img src="http://streetwill.co/uploads/post/photo/712/show_J4bkRVj48GNacMELdZMj4IkUNO1YFsFlgkcMpmU8qqA.JPG"
-             alt=""></div>
-</div>
+<!--<div class="swiper2">-->
+<!--<div class="slide2">-->
+<!--<img src="http://streetwill.co/uploads/post/photo/738/show_kFs0yo9h0DOhyKKeeRhI6WDhnSuzw8KrcQ59G1iz_pg.jpg"-->
+<!--alt="">-->
+<!--</div>-->
+<!--<div class="slide2">-->
+<!--<img src="http://streetwill.co/uploads/post/photo/659/show_RWAy4NXsFyKffsrD6uLliS-d78nrC90zXJtmkZ_aV3g.jpg"-->
+<!--alt=""></div>-->
+<!--<div class="slide2">-->
+<!--<img src="http://streetwill.co/uploads/post/photo/712/show_J4bkRVj48GNacMELdZMj4IkUNO1YFsFlgkcMpmU8qqA.JPG"-->
+<!--alt=""></div>-->
+<!--</div>-->
 <script src="../lib/zepto.js"></script>
 <script src="zepto.carousel.js"></script>
 <script src="index.js"></script>
