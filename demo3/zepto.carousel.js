@@ -91,14 +91,22 @@ var Carousel = function () {
 
             this.parentEle = $(this.parentClass); // 获取父元素
             this.childEles = $(this.childClass);
+            if (this.parentEle.length == 0 || this.childEles == 0) {
+                console.log('没有查询到该元素!');
+                return;
+            }
+            this.arrayAHref = []; // 存储a的href
+            this.specialElePrevSucc = false;
             this.childLength = this.childEles.length; // 子元素长度
             this.direction = 'right'; // 默认移动方向
             this.startIndex = 0; // 初始位置下标
+            this.loopIndex = this.startIndex;
             this.transitionTime = this.parentEle.css('transition');
             var strIndex = this.find(this.transitionTime, 's', 0);
             // 如果没有设置默认缓冲时间,设置成0.4s
             if (this.transitionTime.substr(strIndex - 1, 1) <= 0) {
                 this.transitionTime = '0.4s';
+                this.setTransitionTime(this.transitionTime);
             }
             // 当loop为true
             if (this.loop) {
@@ -108,7 +116,9 @@ var Carousel = function () {
                 this.childLength = this.childLength + 2; // 总长度+2
                 this.childEles = $(this.childClass); // 重新获取子元素
             }
-            this.screenWidth = $(window).width(); // 屏幕宽
+            $('img').attr('draggable', 'false');
+            $('a').attr('draggable', 'false');
+            this.screenWidth = $('body').width(); // 屏幕宽
             this.lineOfPoint = Math.ceil(this.screenWidth * this.movePercent); // 子元素移动多长距离才能滚动到下一个
             this.childEleWidth = this.screenWidth * this.seize;
 
@@ -124,11 +134,14 @@ var Carousel = function () {
                 display: 'flex'
             });
             // 这里不能设置为0,否则不会触发回调
-            this.setTransitionTime('0.000001s');
+            this.setTransitionTime('0s');
             // 瞬间移动
-            this.move(this.currPosition, function () {
-                _this.initCallBack(_this.startIndex);
-                _this.setTransitionTime(_this.transitionTime);
+            this.move({
+                targetPosition: this.currPosition,
+                callback: function callback() {
+                    _this.initCallBack(_this.startIndex);
+                    _this.setTransitionTime(_this.transitionTime);
+                }
             });
             // 开启自动轮播
             this.run();
@@ -154,6 +167,56 @@ var Carousel = function () {
             }
             if (e.preventDefault) e.preventDefault();
             e.returnValue = false;
+        }
+
+        /**
+         * 忽略某些元素默认事件
+         */
+
+    }, {
+        key: 'disableSpecialEle',
+        value: function disableSpecialEle() {
+            if (this.specialElePrevSucc) {
+                return;
+            }
+            var aEles = Array.from($(this.parentEle.selector + ' a'));
+            var length = aEles.length;
+            // 存储所有的a链接
+            for (var i in aEles) {
+                if (this.arrayAHref.length != length) {
+                    this.arrayAHref.push(aEles[i].href);
+                }
+                aEles[i].href = 'javascript:;';
+            }
+            // $('a').on('click', this.preventDefault);
+            this.specialElePrevSucc = true;
+        }
+
+        /**
+         * 恢复某些元素默认事件
+         */
+
+    }, {
+        key: 'enableSpecialEle',
+        value: function enableSpecialEle() {
+            if (!this.specialElePrevSucc) {
+                return;
+            }
+            var aEles = Array.from($(this.parentEle.selector + ' a'));
+            // 存储所有的a链接
+            for (var i in aEles) {
+                aEles[i].href = this.arrayAHref[i];
+            }
+            // console.log('解封');
+            // $('a').off('click', this.preventDefault);
+            this.specialElePrevSucc = false;
+        }
+    }, {
+        key: 'preventDefault',
+        value: function preventDefault(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
         }
 
         /**
@@ -186,20 +249,20 @@ var Carousel = function () {
 
     }, {
         key: 'move',
-        value: function move(index) {
-            var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        value: function move() {
+            var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+                targetPosition = _ref2.targetPosition,
+                _ref2$callback = _ref2.callback,
+                callback = _ref2$callback === undefined ? null : _ref2$callback,
+                _ref2$time = _ref2.time,
+                time = _ref2$time === undefined ? 400 : _ref2$time;
 
             var parentEle = this.parentEle;
+            setTimeout(function () {
+                callback && callback();
+            }, time);
             parentEle.css({
-                transform: 'translateX(' + index + 'px)'
-            });
-
-            if (callback == null) {
-                return;
-            }
-            parentEle.on('transitionend webkitTransitionEnd', function () {
-                callback();
-                parentEle.off('transitionend webkitTransitionEnd');
+                transform: 'translateX(' + targetPosition + 'px)'
             });
         }
     }, {
@@ -219,21 +282,49 @@ var Carousel = function () {
         value: function loopMove() {
             var _this2 = this;
 
-            if (this.loop) {
-                // 向右到达最后
-                if (this.startIndex == this.childLength - 2 && this.direction == 'right') {
-                    this.startIndex = 0;
-                }
-                // 向左到达最前
-                if (this.startIndex == 0 && this.direction == 'left') {
-                    this.startIndex = this.childLength - 2;
-                }
-                this.currPosition = this.childEleWidth * this.startIndex * -1;
+            var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+                _ref3$direction = _ref3.direction,
+                direction = _ref3$direction === undefined ? null : _ref3$direction,
+                _ref3$callback = _ref3.callback,
+                _callback = _ref3$callback === undefined ? null : _ref3$callback;
+
+            if (!this.loop) {
+                return;
+            }
+            // if (this.loopIndex == 1 || this.loopIndex == this.childLength - 2) {
+            //     return;
+            // }
+            if (direction == null) {
+                direction = this.direction;
+            }
+            this.setTransitionTime('0s');
+            var move = function move() {
+                var self = _this2;
+                self.currPosition = self.childEleWidth * self.startIndex * -1;
                 // 瞬间移动
-                this.move(this.currPosition, function () {
-                    _this2.setTransitionTime(_this2.transitionTime);
-                    _this2.changedCallBack(_this2.startIndex);
+                self.move({
+                    targetPosition: _this2.currPosition,
+                    // time          : 0,
+                    callback: function callback() {
+                        self.setTransitionTime(self.transitionTime);
+                        self.changedCallBack(self.startIndex);
+                        _callback && _callback();
+                    }
                 });
+            };
+            // 向右到达最后
+            if (this.startIndex == this.childLength - 1 && direction == 'right') {
+                this.startIndex = 1;
+                this.loopIndex = this.startIndex;
+                move();
+                return;
+            }
+            // 向左到达最前
+            if (this.startIndex == 0 && direction == 'left') {
+                this.startIndex = this.childLength - 2;
+                this.loopIndex = this.startIndex;
+                move();
+                return;
             }
         }
 
@@ -260,26 +351,44 @@ var Carousel = function () {
             startIndex = 0,
                 // 默认index,不等于this.startIndex哦,这里只是缓存
             transitionTime = this.transitionTime;
-            this.parentEle.on('touchstart', function (e) {
+            var eventStart = function eventStart(e) {
                 // 在左右移动的时候,禁止上下移动
                 _this3.disableTouchMove();
                 _this3.setTransitionTime('0s');
                 clearInterval(_this3.timer);
                 _this3.timer = null;
                 _this3.loopMove();
-                startPosition.x = e.changedTouches[0].pageX;
-            });
-            this.parentEle.on('touchmove', function (e) {
-                endPosition.x = e.changedTouches[0].pageX;
+                if (typeof e.changedTouches == 'undefined') {
+                    startPosition.x = e.clientX;
+                } else {
+                    startPosition.x = e.changedTouches[0].pageX;
+                }
+            };
+
+            var eventMove = function eventMove(e) {
+                if (typeof e.changedTouches == 'undefined') {
+                    endPosition.x = e.clientX;
+                } else {
+                    endPosition.x = e.changedTouches[0].pageX;
+                }
                 moveDistance = Math.ceil(endPosition.x - startPosition.x);
                 absMoveDistance = Math.abs(moveDistance);
+                if (absMoveDistance > 20) {
+                    _this3.disableSpecialEle();
+                } else {
+                    _this3.enableSpecialEle();
+                }
                 // 可拖动的距离,默认是元素的宽
                 if (absMoveDistance > childEleWidth) {
                     moveDistance = moveDistance > 0 ? childEleWidth : childEleWidth * -1;
                 }
-                _this3.move(_this3.currPosition * 1 + moveDistance * 1);
-            });
-            this.parentEle.on('touchend', function () {
+                _this3.move({ targetPosition: _this3.currPosition * 1 + moveDistance * 1 });
+            };
+
+            var eventEnd = function eventEnd(e) {
+                if (absMoveDistance < 20) {
+                    return;
+                }
                 _this3.enableTouchMove();
                 _this3.setTransitionTime(transitionTime);
                 _this3.direction = direction = _this3.getDirection(startPosition, endPosition);
@@ -289,17 +398,53 @@ var Carousel = function () {
                         startIndex--;
                         _this3.startIndex = startIndex < 0 ? 0 : startIndex;
                     }
-
                     if (direction == 'right') {
                         startIndex++;
                         _this3.startIndex = startIndex >= _this3.childLength ? _this3.childLength - 1 : startIndex;
                     }
                 }
                 _this3.currPosition = childEleWidth * _this3.startIndex * -1;
-                _this3.move(_this3.currPosition, function () {
-                    _this3.changedCallBack(_this3.startIndex);
+                var self = _this3;
+                self.move({
+                    targetPosition: _this3.currPosition,
+                    callback: function callback() {
+                        _this3.changedCallBack(_this3.startIndex);
+                        _this3.enableSpecialEle();
+                        absMoveDistance = 0;
+                    }
                 });
                 _this3.run();
+            };
+            // 是否是通过鼠标
+            var isMouse = false;
+            this.parentEle.on('touchstart mousedown', function (e) {
+                // 是通过鼠标
+                if (typeof e.changedTouches == 'undefined') {
+                    if (e.buttons != 1) {
+                        return;
+                    }
+                }
+                eventStart(e);
+            });
+            this.parentEle.on('touchmove mousemove', function (e) {
+                // 是通过鼠标
+                if (typeof e.changedTouches == 'undefined') {
+                    if (e.buttons != 1) {
+                        return;
+                    }
+                    isMouse = true;
+                }
+                eventMove(e);
+            });
+            this.parentEle.on('touchend mouseup', function (e) {
+                // 是通过鼠标
+                if (typeof e.changedTouches == 'undefined') {
+                    if (!isMouse) {
+                        return;
+                    }
+                    isMouse = false;
+                }
+                eventEnd(e);
             });
         }
 
@@ -328,22 +473,32 @@ var Carousel = function () {
             if (!this.autoPlay) {
                 return;
             }
+            clearInterval(this.timer);
             this.timer = setInterval(function () {
-                _this4.setTransitionTime(_this4.transitionTime);
-                _this4.startIndex++;
-                if (_this4.startIndex >= _this4.childLength) {
-                    _this4.startIndex = 0;
+                var startIndex = _this4.startIndex;
+                startIndex++;
+                // 是否为loop循环模式
+                if (_this4.loop) {
+                    _this4.startIndex = startIndex >= _this4.childLength ? _this4.childLength - 1 : startIndex;
+                    _this4.setTransitionTime(_this4.transitionTime);
+                    _this4.currPosition = _this4.childEleWidth * _this4.startIndex * -1;
+                    var self = _this4;
+                    // 移动到新的位置
+                    self.move({
+                        targetPosition: _this4.currPosition,
+                        callback: function callback() {
+                            self.loopMove({
+                                direction: self.direction == 'left' && self.startIndex == self.childLength - 1 ? 'right' : self.direction
+                            });
+                        }
+                    });
+                    return;
                 }
+                // 一般模式
+                _this4.startIndex = startIndex >= _this4.childLength ? 0 : startIndex;
                 _this4.currPosition = _this4.childEleWidth * _this4.startIndex * -1;
-                _this4.move(_this4.currPosition, function () {
-                    // 当自动轮播到最后克隆的位置
-                    if (_this4.startIndex == _this4.childLength - 2 && _this4.loop) {
-                        _this4.direction == 'right';
-                        _this4.setTransitionTime('0.000001s');
-                        _this4.loopMove();
-                        return;
-                    }
-                    _this4.changedCallBack(_this4.startIndex);
+                _this4.move({
+                    targetPosition: _this4.currPosition
                 });
             }, this.autoPlay);
         }

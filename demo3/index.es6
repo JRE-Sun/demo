@@ -2,6 +2,9 @@ $(function () {
     new Carousel({
         parentClass: '.swiper0',
         childClass : '.slide0',
+        autoPlay   : '2000',
+        seize      : 1,
+        loop       : true,
     });
 
 
