@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        html {
+            font-size: 12px;
+        }
+
+        .scroll-number {
+            overflow: hidden;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+        }
+
+        .scroll-number span {
+            font-size: 4rem;
+            width: 35px;
+            color: #E84B5D;
+            float: left;
+            text-align: center;
+            word-break: break-all;
+            /*text-orientation: upright;*/
+            /*writing-mode: tb-rl;*/
+            transition: .4s;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+<h1 id="num" ></h1>
+<div class="scroll-number"></div>
+<input type="text"> <a class="send" href="javascript:;">提交</a>
+<script src="../lib/zepto.js"></script>
+<script src="index.js"></script>
+</body>
+</html>

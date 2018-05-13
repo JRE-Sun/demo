@@ -21,15 +21,23 @@ function drawRound(index) {
     ctx.fillText(index + '%', 90, 90);
 }
 
+var aa = 0;
+(function drawFrame() {
+    requestAnimationFrame(function () {
+        drawFrame();
+        drawRound(aa);
+    });
+}());
+
 
 new Progress({
     speedArray      : [1, 5],
     endPositionArray: [75, 95],
     init            : (index) => {
-        drawRound(index);
+        aa = index;
     },
     loading         : (index) => {
-        drawRound(index)
+        aa                                                = index;
         document.querySelector('#progress').style.cssText = "width:" + index + "%";
         // drawRound(index);
     },
