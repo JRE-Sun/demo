@@ -96,7 +96,7 @@ var Carousel = function () {
                 return;
             }
             this.screenEleNums = Math.ceil(1 / this.seize); // 一屏能够占据几个子元素
-            this.arrayAHref = []; // 存储a的href
+            this.aHref = ''; // 存储a的href
             this.specialElePrevSucc = false;
             this.childLength = this.childEles.length; // 子元素长度
             // 当子元素长度小于 首屏能够存放的
@@ -195,20 +195,15 @@ var Carousel = function () {
 
     }, {
         key: 'disableSpecialEle',
-        value: function disableSpecialEle() {
+        value: function disableSpecialEle(ele) {
             if (this.specialElePrevSucc) {
                 return;
             }
-            var aEles = Array.from($(this.parentEle.selector + ' a'));
-            var length = aEles.length;
-            // 存储所有的a链接
-            for (var i in aEles) {
-                if (this.arrayAHref.length != length) {
-                    this.arrayAHref.push(aEles[i].href);
-                }
-                aEles[i].href = 'javascript:;';
-            }
-            // $('a').on('click', this.preventDefault);
+
+            ele = typeof ele.href == 'undefined' ? $(ele).parents('a')[0] : ele;
+
+            this.aHref = ele.href;
+            ele.href = 'javascript:;';
             this.specialElePrevSucc = true;
         }
 
@@ -218,17 +213,13 @@ var Carousel = function () {
 
     }, {
         key: 'enableSpecialEle',
-        value: function enableSpecialEle() {
+        value: function enableSpecialEle(ele) {
             if (!this.specialElePrevSucc) {
                 return;
             }
-            var aEles = Array.from($(this.parentEle.selector + ' a'));
-            // 存储所有的a链接
-            for (var i in aEles) {
-                aEles[i].href = this.arrayAHref[i];
-            }
-            // console.log('解封');
-            // $('a').off('click', this.preventDefault);
+            ele = typeof ele.href == 'undefined' ? $(ele).parents('a')[0] : ele;
+
+            ele.href = this.aHref;
             this.specialElePrevSucc = false;
         }
     }, {
@@ -391,9 +382,9 @@ var Carousel = function () {
                 moveDistance = Math.ceil(endPosition.x - startPosition.x);
                 absMoveDistance = Math.abs(moveDistance);
                 if (absMoveDistance > 20) {
-                    _this3.disableSpecialEle();
+                    _this3.disableSpecialEle(e.target);
                 } else {
-                    _this3.enableSpecialEle();
+                    _this3.enableSpecialEle(e.target);
                 }
                 // 可拖动的距离,默认是元素的宽
                 if (absMoveDistance > childEleWidth) {
@@ -426,7 +417,7 @@ var Carousel = function () {
                     targetPosition: _this3.currPosition,
                     callback: function callback() {
                         _this3.changedCallBack(_this3.startIndex);
-                        _this3.enableSpecialEle();
+                        _this3.enableSpecialEle(e.target);
                         absMoveDistance = 0;
                     }
                 });
@@ -461,6 +452,10 @@ var Carousel = function () {
                     }
                     isMouse = false;
                 }
+                eventEnd(e);
+            });
+
+            this.parentEle.on('mouseleave', function (e) {
                 eventEnd(e);
             });
         }

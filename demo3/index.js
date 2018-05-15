@@ -4,7 +4,7 @@ $(function () {
     new Carousel({
         parentClass: '.swiper0',
         childClass: '.slide0',
-        autoPlay: '1000',
+        // autoPlay   : '1000',
         seize: .7,
         loop: true
     });

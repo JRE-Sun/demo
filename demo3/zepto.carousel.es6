@@ -65,7 +65,7 @@ class Carousel {
             return;
         }
         this.screenEleNums      = Math.ceil(1 / this.seize); // 一屏能够占据几个子元素
-        this.arrayAHref         = []; // 存储a的href
+        this.aHref              = ''; // 存储a的href
         this.specialElePrevSucc = false;
         this.childLength        = this.childEles.length; // 子元素长度
         // 当子元素长度小于 首屏能够存放的
@@ -157,37 +157,28 @@ class Carousel {
     /**
      * 忽略某些元素默认事件
      */
-    disableSpecialEle() {
+    disableSpecialEle(ele) {
         if (this.specialElePrevSucc) {
             return;
         }
-        let aEles  = Array.from($(this.parentEle.selector + ' a'));
-        let length = aEles.length;
-        // 存储所有的a链接
-        for (let i in aEles) {
-            if (this.arrayAHref.length != length) {
-                this.arrayAHref.push(aEles[i].href);
-            }
-            aEles[i].href = 'javascript:;';
-        }
-        // $('a').on('click', this.preventDefault);
+
+        ele = typeof ele.href == 'undefined' ? $(ele).parents('a')[0] : ele;
+
+        this.aHref              = ele.href;
+        ele.href                = 'javascript:;';
         this.specialElePrevSucc = true;
     }
 
     /**
      * 恢复某些元素默认事件
      */
-    enableSpecialEle() {
+    enableSpecialEle(ele) {
         if (!this.specialElePrevSucc) {
             return;
         }
-        let aEles = Array.from($(this.parentEle.selector + ' a'));
-        // 存储所有的a链接
-        for (let i in aEles) {
-            aEles[i].href = this.arrayAHref[i];
-        }
-        // console.log('解封');
-        // $('a').off('click', this.preventDefault);
+        ele = typeof ele.href == 'undefined' ? $(ele).parents('a')[0] : ele;
+
+        ele.href                = this.aHref;
         this.specialElePrevSucc = false;
     }
 
@@ -311,9 +302,9 @@ class Carousel {
             moveDistance    = Math.ceil(endPosition.x - startPosition.x);
             absMoveDistance = Math.abs(moveDistance);
             if (absMoveDistance > 20) {
-                this.disableSpecialEle();
+                this.disableSpecialEle(e.target);
             } else {
-                this.enableSpecialEle();
+                this.enableSpecialEle(e.target);
             }
             // 可拖动的距离,默认是元素的宽
             if (absMoveDistance > childEleWidth) {
@@ -346,7 +337,7 @@ class Carousel {
                 targetPosition: this.currPosition,
                 callback      : () => {
                     this.changedCallBack(this.startIndex);
-                    this.enableSpecialEle();
+                    this.enableSpecialEle(e.target);
                     absMoveDistance = 0;
                 }
             });
@@ -381,6 +372,10 @@ class Carousel {
                 }
                 isMouse = false;
             }
+            eventEnd(e);
+        });
+
+        this.parentEle.on('mouseleave', (e) => {
             eventEnd(e);
         });
     }
