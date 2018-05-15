@@ -1,10 +1,12 @@
+'use strict';
+
 $('.btn').on('click', function () {
     var $this = $(this);
     // 禁用
     $this.attr('disabled', 'disabled');
-    let luckDraw = new LuckDraw({
+    var luckDraw = new LuckDraw({
         selector: '.lottery',
-        callback: () => {
+        callback: function callback() {
             $this.removeAttr('disabled');
         }
     });
