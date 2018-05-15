@@ -99,9 +99,11 @@ class PageGallery {
     setGalleryImgStyle() {
         let $galleryImg = this.$galleryImg;
         $galleryImg.css({
-            'height'   : 'auto',
-            'width'    : 'auto',
-            'max-width': '100%',
+            'height'             : 'auto',
+            'width'              : 'auto',
+            'max-width'          : '100%',
+            '-webkit-user-select': 'none',
+            'user-select'        : 'none',
         });
         // 禁止拖拽img
         $galleryImg.attr('draggable', 'false');
@@ -255,7 +257,6 @@ class PageGallery {
         }
 
         let eventEnd = (e) => {
-            this.enableTouchMove();
             this.setTransitionTime(transitionTime);
             direction = this.getDirection(startPosition, endPosition);
             index     = this.index;
@@ -301,6 +302,7 @@ class PageGallery {
         });
         this.$imgWrap.on('touchend mouseup', (e) => {
             endTime = new Date().getTime();
+            this.enableTouchMove();
             if (endTime - startTime < 200 && absMoveDistance < 20) {
                 $pageGallery.hide();
                 e.stopPropagation();

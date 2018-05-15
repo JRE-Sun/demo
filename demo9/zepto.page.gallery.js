@@ -124,7 +124,9 @@ var PageGallery = function () {
             $galleryImg.css({
                 'height': 'auto',
                 'width': 'auto',
-                'max-width': '100%'
+                'max-width': '100%',
+                '-webkit-user-select': 'none',
+                'user-select': 'none'
             });
             // 禁止拖拽img
             $galleryImg.attr('draggable', 'false');
@@ -311,7 +313,6 @@ var PageGallery = function () {
             };
 
             var eventEnd = function eventEnd(e) {
-                _this2.enableTouchMove();
                 _this2.setTransitionTime(transitionTime);
                 direction = _this2.getDirection(startPosition, endPosition);
                 index = _this2.index;
@@ -357,6 +358,7 @@ var PageGallery = function () {
             });
             this.$imgWrap.on('touchend mouseup', function (e) {
                 endTime = new Date().getTime();
+                _this2.enableTouchMove();
                 if (endTime - startTime < 200 && absMoveDistance < 20) {
                     $pageGallery.hide();
                     e.stopPropagation();
