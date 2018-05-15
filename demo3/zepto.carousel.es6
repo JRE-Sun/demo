@@ -106,8 +106,9 @@ class Carousel {
         });
         // 设置父元素宽
         this.parentEle.css({
-            width  : this.childEleWidth * this.childLength,
-            display: 'flex',
+            'visibility': 'hidden',
+            width       : this.childEleWidth * this.childLength,
+            display     : 'flex',
         });
         // 这里设置好子元素,父元素后->元素长度加上margin值的
         this.childEleWidth = this.childEleWidth * 1;
@@ -119,6 +120,9 @@ class Carousel {
             callback      : () => {
                 this.initCallBack(this.startIndex);
                 this.setTransitionTime(this.transitionTime);
+                this.parentEle.css({
+                    'visibility': 'visible',
+                });
             }
         });
         // 开启自动轮播
@@ -161,9 +165,9 @@ class Carousel {
         if (this.specialElePrevSucc) {
             return;
         }
-
         ele = typeof ele.href == 'undefined' ? $(ele).parents('a')[0] : ele;
-
+        // 当滚动item里面没有a
+        if (typeof ele == 'undefined') return;
         this.aHref              = ele.href;
         ele.href                = 'javascript:;';
         this.specialElePrevSucc = true;
@@ -177,7 +181,8 @@ class Carousel {
             return;
         }
         ele = typeof ele.href == 'undefined' ? $(ele).parents('a')[0] : ele;
-
+        // 当滚动item里面没有a
+        if (typeof ele == 'undefined') return;
         ele.href                = this.aHref;
         this.specialElePrevSucc = false;
     }

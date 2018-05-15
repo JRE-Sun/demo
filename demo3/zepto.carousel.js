@@ -137,6 +137,7 @@ var Carousel = function () {
             });
             // 设置父元素宽
             this.parentEle.css({
+                'visibility': 'hidden',
                 width: this.childEleWidth * this.childLength,
                 display: 'flex'
             });
@@ -150,6 +151,9 @@ var Carousel = function () {
                 callback: function callback() {
                     _this.initCallBack(_this.startIndex);
                     _this.setTransitionTime(_this.transitionTime);
+                    _this.parentEle.css({
+                        'visibility': 'visible'
+                    });
                 }
             });
             // 开启自动轮播
@@ -199,9 +203,9 @@ var Carousel = function () {
             if (this.specialElePrevSucc) {
                 return;
             }
-
             ele = typeof ele.href == 'undefined' ? $(ele).parents('a')[0] : ele;
-
+            // 当滚动item里面没有a
+            if (typeof ele == 'undefined') return;
             this.aHref = ele.href;
             ele.href = 'javascript:;';
             this.specialElePrevSucc = true;
@@ -218,7 +222,8 @@ var Carousel = function () {
                 return;
             }
             ele = typeof ele.href == 'undefined' ? $(ele).parents('a')[0] : ele;
-
+            // 当滚动item里面没有a
+            if (typeof ele == 'undefined') return;
             ele.href = this.aHref;
             this.specialElePrevSucc = false;
         }
