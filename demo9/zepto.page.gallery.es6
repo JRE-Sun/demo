@@ -17,74 +17,112 @@ class PageGallery {
     }
 
     init() {
-        this.html         = this.creatDom();
-        this.screenWidth  = $(window).width();
-        this.screenHeight = $(window).height();
-        this.lineOfPoint  = Math.ceil(this.screenWidth * 0.25); // 子元素移动多长距离才能滚动到下一个
+        this.html           = this.creatDom();
+        this.screenWidth    = $(window).width();
+        this.screenHeight   = $(window).height();
+        this.transitionTime = '.3'; // 设置移动动画时间为0.3s
+        this.lineOfPoint    = Math.ceil(this.screenWidth * 0.25); // 子元素移动多长距离才能滚动到下一个
         $('body').append(this.html);
         this.$pageGallery = $('.page-gallery'); // 这个是最外面div,fixed全屏的
         this.$imgContent  = this.$pageGallery.find('.img-content'); // 每个图片的包裹元素
+        this.$imgWrap     = this.$pageGallery.find('.img-wrap'); // 包裹着所有.img-content的元素,就是来移动这个形成滚动
+        this.$galleryImg  = this.$imgWrap.find('img'); // 画廊的所有img
+        this.childLength  = this.$imgContent.length; // 所有img元素的个数
+        this.currPosition = this.index * this.childLength * -1; // 初始位置
+        // 设置每个包裹img的div样式
         this.$imgContent.css({
             'flex'           : '1',
             'align-items'    : 'center',
             'display'        : 'flex',
             'justify-content': 'center',
         });
-        this.$pageGallery.find('img').css({
-            'max-width': '100%',
-            'width'    : 'auto',
-        });
-        [...this.$pageGallery.find('img')].forEach((img) => {
-            img.onerror      = () => {
-                console.log(`${img}加载失败`);
-                return;
-            }
-            let setImgWidth  = () => {
-                $img.width(this.screenWidth);
-                $(img).height(Math.ceil(currHeight * this.screenHeight / currWidth));
-            }
-            let setImgHeight = () => {
-                $img.height(this.screenHeight);
-                $(img).width(Math.ceil(currWidth * this.screenHeight / currHeight));
-            }
-            let currWidth    = 0;
-            let currHeight   = 0;
-            let $img         = $(img);
-            img.onload       = () => {
-                currWidth  = img.width;
-                currHeight = img.height;
-                // 图片宽超出
-                if (currWidth > this.screenWidth && currHeight <= this.screenHeight) {
-                    setImgWidth()
-                    return;
-                }
-                // 图片高超出
-                if (currWidth <= this.screenWidth && currHeight > this.screenHeight) {
-                    setImgHeight();
-                    return;
-                }
-                // 都超出(这里不好)
-                if (currWidth > this.screenWidth && currHeight > this.screenHeight) {
-                    if (this.screenWidth > 1000) {
-                        setImgHeight();
-                    }
-                }
-            }
-        });
-        // 禁止拖拽img
-        $('img').attr('draggable', 'false');
-        this.childLength  = this.$imgContent.length; // 所有img元素的个数
-        this.currPosition = this.index * this.childLength * -1; // 初始位置
-        this.$imgWrap     = this.$pageGallery.find('.img-wrap'); // 包裹着所有.img-content的元素,就是来移动这个形成滚动
+        // 设置img样式
+        this.setGalleryImgStyle();
+        // 设置包裹.img-content的div,.img-wrap样式
         this.$imgWrap.css({
             'display'  : 'flex',
             'height'   : '100%',
             'width'    : this.childLength * this.screenWidth,
             'transform': `translateX(0)`,
         });
-        this.transitionTime = '.3'; // 设置移动动画时间为0.3s
+        // 初始化电脑端箭头
+        this.initBtn();
         // 开启事件绑定
         this.bindEvent();
+    }
+
+    initBtn() {
+        // 当 当前设备小于平板分辨率
+        if (this.screenWidth < 768) {
+            return;
+        }
+        let self = this;
+        // 认为是大屏幕,出现按钮
+        self.$pageGallery.append('<i class="next-btn"></i><i class="pre-btn"></i>');
+        self.$nextBtn = self.$pageGallery.find('.next-btn');
+        self.$preBtn  = self.$pageGallery.find('.pre-btn');
+        let $btn      = self.$pageGallery.find('i');
+        $btn.data('action', 'next');
+        $btn.css({
+            'position'          : 'absolute',
+            'border'            : '34px solid transparent',
+            'top'               : '50%',
+            'border-right-color': '#fff',
+            'cursor'            : 'pointer',
+            'transform'         : 'translateY(-50%)',
+        });
+        self.$preBtn.css({
+            'right'             : '0',
+            'border-right-color': 'transparent',
+            'border-left-color' : '#fff',
+        });
+        self.$preBtn.data('action', 'pre');
+        $btn.on('click', function () {
+            let index       = self.index;
+            let childLength = self.childLength;
+
+            // 上一个
+            if ($(this).data('action') == 'next') {
+                index--;
+                self.index = (index < 0) ? 0 : index;
+            } else {
+                index++;
+                self.index = (index >= childLength) ? (childLength - 1) : index;
+            }
+            self.currPosition = (self.screenWidth * self.index) * -1;
+            self.move({
+                targetPosition: self.currPosition,
+            });
+        });
+    }
+
+    setGalleryImgStyle() {
+        let $galleryImg = this.$galleryImg;
+        $galleryImg.css({
+            'height'   : 'auto',
+            'width'    : 'auto',
+            'max-width': '100%',
+        });
+        // 禁止拖拽img
+        $galleryImg.attr('draggable', 'false');
+        [...$galleryImg].forEach((img) => {
+            img.onerror = () => {
+                console.log(`${img}加载失败`);
+                return;
+            }
+            img.onload  = () => {
+                let currWidth  = img.width;
+                let currHeight = img.height;
+                let $img       = $(img);
+                // 图片高超出
+                if (currHeight > this.screenHeight && this.screenHeight > 768) {
+                    $img.css({
+                        'max-height': this.screenHeight + 'px',
+                        'width'     : Math.ceil(currWidth * this.screenHeight / currHeight) + 'px',
+                    });
+                }
+            }
+        });
     }
 
     /**
@@ -278,5 +316,9 @@ class PageGallery {
             }
             eventEnd(e);
         });
+        // 当鼠标移出元素
+        this.$imgWrap.on('mouseleave', (e) => {
+            eventEnd(e);
+        })
     }
 }
