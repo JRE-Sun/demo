@@ -17,9 +17,10 @@ class PageGallery {
     }
 
     init() {
-        this.html        = this.creatDom();
-        this.screenWidth = $(window).width();
-        this.lineOfPoint = Math.ceil(this.screenWidth * 0.25); // 子元素移动多长距离才能滚动到下一个
+        this.html         = this.creatDom();
+        this.screenWidth  = $(window).width();
+        this.screenHeight = $(window).height();
+        this.lineOfPoint  = Math.ceil(this.screenWidth * 0.25); // 子元素移动多长距离才能滚动到下一个
         $('body').append(this.html);
         this.$pageGallery = $('.page-gallery'); // 这个是最外面div,fixed全屏的
         this.$imgContent  = this.$pageGallery.find('.img-content'); // 每个图片的包裹元素
@@ -28,6 +29,47 @@ class PageGallery {
             'align-items'    : 'center',
             'display'        : 'flex',
             'justify-content': 'center',
+        });
+        this.$pageGallery.find('img').css({
+            'max-width': '100%',
+            'width'    : 'auto',
+        });
+        [...this.$pageGallery.find('img')].forEach((img) => {
+            img.onerror      = () => {
+                console.log(`${img}加载失败`);
+                return;
+            }
+            let setImgWidth  = () => {
+                $img.width(this.screenWidth);
+                $(img).height(Math.ceil(currHeight * this.screenHeight / currWidth));
+            }
+            let setImgHeight = () => {
+                $img.height(this.screenHeight);
+                $(img).width(Math.ceil(currWidth * this.screenHeight / currHeight));
+            }
+            let currWidth    = 0;
+            let currHeight   = 0;
+            let $img         = $(img);
+            img.onload       = () => {
+                currWidth  = img.width;
+                currHeight = img.height;
+                // 图片宽超出
+                if (currWidth > this.screenWidth && currHeight <= this.screenHeight) {
+                    setImgWidth()
+                    return;
+                }
+                // 图片高超出
+                if (currWidth <= this.screenWidth && currHeight > this.screenHeight) {
+                    setImgHeight();
+                    return;
+                }
+                // 都超出(这里不好)
+                if (currWidth > this.screenWidth && currHeight > this.screenHeight) {
+                    if (this.screenWidth > 1000) {
+                        setImgHeight();
+                    }
+                }
+            }
         });
         // 禁止拖拽img
         $('img').attr('draggable', 'false');

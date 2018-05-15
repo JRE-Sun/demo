@@ -36,8 +36,11 @@ var PageGallery = function () {
     }, {
         key: 'init',
         value: function init() {
+            var _this = this;
+
             this.html = this.creatDom();
             this.screenWidth = $(window).width();
+            this.screenHeight = $(window).height();
             this.lineOfPoint = Math.ceil(this.screenWidth * 0.25); // 子元素移动多长距离才能滚动到下一个
             $('body').append(this.html);
             this.$pageGallery = $('.page-gallery'); // 这个是最外面div,fixed全屏的
@@ -47,6 +50,47 @@ var PageGallery = function () {
                 'align-items': 'center',
                 'display': 'flex',
                 'justify-content': 'center'
+            });
+            this.$pageGallery.find('img').css({
+                'max-width': '100%',
+                'width': 'auto'
+            });
+            [].concat(_toConsumableArray(this.$pageGallery.find('img'))).forEach(function (img) {
+                img.onerror = function () {
+                    console.log(img + '\u52A0\u8F7D\u5931\u8D25');
+                    return;
+                };
+                var setImgWidth = function setImgWidth() {
+                    $img.width(_this.screenWidth);
+                    $(img).height(Math.ceil(currHeight * _this.screenHeight / currWidth));
+                };
+                var setImgHeight = function setImgHeight() {
+                    $img.height(_this.screenHeight);
+                    $(img).width(Math.ceil(currWidth * _this.screenHeight / currHeight));
+                };
+                var currWidth = 0;
+                var currHeight = 0;
+                var $img = $(img);
+                img.onload = function () {
+                    currWidth = img.width;
+                    currHeight = img.height;
+                    // 图片宽超出
+                    if (currWidth > _this.screenWidth && currHeight <= _this.screenHeight) {
+                        setImgWidth();
+                        return;
+                    }
+                    // 图片高超出
+                    if (currWidth <= _this.screenWidth && currHeight > _this.screenHeight) {
+                        setImgHeight();
+                        return;
+                    }
+                    // 都超出(这里不好)
+                    if (currWidth > _this.screenWidth && currHeight > _this.screenHeight) {
+                        if (_this.screenWidth > 1000) {
+                            setImgHeight();
+                        }
+                    }
+                };
             });
             // 禁止拖拽img
             $('img').attr('draggable', 'false');
@@ -166,7 +210,7 @@ var PageGallery = function () {
     }, {
         key: 'bindEvent',
         value: function bindEvent() {
-            var _this = this;
+            var _this2 = this;
 
             var startPosition = {},
                 // 触摸开始位置
@@ -202,8 +246,8 @@ var PageGallery = function () {
             var eventStart = function eventStart(e) {
                 startTime = new Date().getTime();
                 // 在左右移动的时候,禁止上下移动
-                _this.disableTouchMove();
-                _this.setTransitionTime('0');
+                _this2.disableTouchMove();
+                _this2.setTransitionTime('0');
                 if (typeof e.changedTouches == 'undefined') {
                     startPosition = e.clientX;
                 } else {
@@ -223,28 +267,28 @@ var PageGallery = function () {
                 if (absMoveDistance > screenWidth) {
                     moveDistance = moveDistance > 0 ? screenWidth : screenWidth * -1;
                 }
-                _this.move({ targetPosition: _this.currPosition * 1 + moveDistance * 1 });
+                _this2.move({ targetPosition: _this2.currPosition * 1 + moveDistance * 1 });
             };
 
             var eventEnd = function eventEnd(e) {
-                _this.enableTouchMove();
-                _this.setTransitionTime(transitionTime);
-                direction = _this.getDirection(startPosition, endPosition);
-                index = _this.index;
-                if (absMoveDistance > _this.lineOfPoint) {
+                _this2.enableTouchMove();
+                _this2.setTransitionTime(transitionTime);
+                direction = _this2.getDirection(startPosition, endPosition);
+                index = _this2.index;
+                if (absMoveDistance > _this2.lineOfPoint) {
                     if (direction == 'left') {
                         index--;
-                        _this.index = index < 0 ? 0 : index;
+                        _this2.index = index < 0 ? 0 : index;
                     }
                     if (direction == 'right') {
                         index++;
-                        _this.index = index >= _this.childLength ? _this.childLength - 1 : index;
+                        _this2.index = index >= _this2.childLength ? _this2.childLength - 1 : index;
                     }
                 }
-                _this.currPosition = screenWidth * _this.index * -1;
-                var self = _this;
+                _this2.currPosition = screenWidth * _this2.index * -1;
+                var self = _this2;
                 self.move({
-                    targetPosition: _this.currPosition,
+                    targetPosition: _this2.currPosition,
                     callback: function callback() {
                         absMoveDistance = 0;
                     }
