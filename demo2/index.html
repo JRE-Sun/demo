@@ -8,22 +8,26 @@
     <title>Document</title>
     <style>
         ul { list-style: none; }
-        .lottery { position: relative; width: 184px; height: 184px; line-height: 58px; text-align: center; overflow: hidden; margin: 0 auto; }
-        .lottery li, .lottery .btn { position: absolute; width: 60px; height: 60px; border: 1px #ccc solid; z-index: 1; }
-        .lottery .item-1 { top: 0; left: 0; }
-        .lottery .item-2 { top: 0; left: 61px; }
-        .lottery .item-3 { top: 0; left: 122px; }
-        .lottery .item-4 { top: 61px; left: 122px; }
-        .lottery .item-5 { top: 122px; left: 122px; }
-        .lottery .item-6 { top: 122px; left: 61px; }
-        .lottery .item-7 { top: 122px; left: 0; }
-        .lottery .item-8 { top: 61px; left: 0; }
-        .lottery .active { border-color: red; z-index: 2; }
-        .lottery .btn { width: 62px; height: 62px; top: 61px; left: 61px; background-color: transparent; cursor: pointer; }
+        .luck-draw { position: relative; width: 184px; height: 184px; line-height: 58px; text-align: center; overflow: hidden; margin: 0 auto; }
+        .luck-draw li, .luck-draw .btn { position: absolute; width: 60px; height: 60px; border: 1px #ccc solid; z-index: 1; }
+        .luck-draw .item-1 { top: 0; left: 0; }
+        .luck-draw .item-2 { top: 0; left: 61px; }
+        .luck-draw .item-3 { top: 0; left: 122px; }
+        .luck-draw .item-4 { top: 61px; left: 122px; }
+        .luck-draw .item-5 { top: 122px; left: 122px; }
+        .luck-draw .item-6 { top: 122px; left: 61px; }
+        .luck-draw .item-7 { top: 122px; left: 0; }
+        .luck-draw .item-8 { top: 61px; left: 0; }
+        .luck-draw .active { border-color: red; z-index: 2; }
+        .luck-draw .btn { width: 62px; height: 62px; top: 61px; left: 61px; background-color: transparent; cursor: pointer; }
+        a{
+            position: fixed;
+            left: 0;
+        }
     </style>
 </head>
 <body>
-<div class="lottery">
+<div class="luck-draw">
     <ul class="list">
         <li class="item-1 active">1</li>
         <li class="item-2">2</li>
@@ -35,6 +39,8 @@
         <li class="item-8">8</li>
     </ul>
     <button class="btn">抽奖</button>
+    <a href="file:///Users/sunjre/Documents/web/demo/demo10/index.html">demo10</a>
+
 </div>
 <script src="../lib/zepto.js"></script>
 <script src="zepto.luckDraw.js"></script>

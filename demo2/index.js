@@ -5,7 +5,7 @@ $('.btn').on('click', function () {
     // 禁用
     $this.attr('disabled', 'disabled');
     var luckDraw = new LuckDraw({
-        selector: '.lottery',
+        selector: '.luck-draw',
         callback: function callback() {
             $this.removeAttr('disabled');
         }
@@ -14,5 +14,5 @@ $('.btn').on('click', function () {
     setTimeout(function () {
         luckDraw.prizeNum = Math.floor(Math.random() * 8);
         console.log(luckDraw.prizeNum);
-    }, 1500);
+    }, 3000);
 });

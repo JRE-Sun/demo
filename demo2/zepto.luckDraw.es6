@@ -2,6 +2,13 @@
  * 九宫格抽奖
  */
 class LuckDraw {
+    /**
+     *
+     * @param callback 停止后的毁掉
+     * @param selector 选择器
+     * @param speed    初始速度
+     * @param minCircleNum 至少转几圈
+     */
     constructor({callback = null, selector = null, speed = 300, minCircleNum = 4} = {}) {
         if (selector == null) return;
         this.$luckDraw    = $(selector);

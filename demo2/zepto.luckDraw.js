@@ -8,6 +8,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * 九宫格抽奖
  */
 var LuckDraw = function () {
+    /**
+     *
+     * @param callback 停止后的毁掉
+     * @param selector 选择器
+     * @param speed    初始速度
+     * @param minCircleNum 至少转几圈
+     */
     function LuckDraw() {
         var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
             _ref$callback = _ref.callback,
