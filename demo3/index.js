@@ -1,6 +1,15 @@
 'use strict';
 
 $(function () {
+
+    new Carousel({
+        parentClass: '.swiper-wrapper',
+        childClass: '.img',
+        autoPlay: '4000',
+        seize: 1,
+        loop: true
+    });
+
     new Carousel({
         parentClass: '.swiper0',
         childClass: '.slide0',

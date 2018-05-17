@@ -1,8 +1,16 @@
 /**
  * 画svg
- * 图形和文字空白比例 3.5:1.5
  */
 class DrawSvg {
+    /**
+     *
+     * @param width   svg 宽
+     * @param height  svg高
+     * @param r       图形半径
+     * @param list    传进来的顶点列表
+     * @param titleSize  title文字字号
+     * @param contentSize  content文字字号
+     */
     constructor({width = 500, height = 500, r = 175, list = null, titleSize = 20, contentSize = 16} = {}) {
         if (list == null) return;
         this.list        = list; // 存储的是坐标数据
@@ -51,7 +59,7 @@ class DrawSvg {
         let circleCenterPoint = this.circleCenterPoint;
         let html              = "<g fill='none' stroke='#8dc0e3' stroke-width='1'>";
         this.list.map(item => {
-            html += `<path stroke-dasharray="5,5" d="M${item.x},${item.y} ${circleCenterPoint.x},${circleCenterPoint.y}"></path>`;
+            html += `<path stroke-dasharray="5,5" d="M${item.vx},${item.vy} ${circleCenterPoint.x},${circleCenterPoint.y}"></path>`;
             html += `<circle cx="${item.x}" cy="${item.y}" r="2" stroke="black" stroke-width="2" fill="#fff"></circle>`;
         });
         html += '</g>';
@@ -69,10 +77,10 @@ class DrawSvg {
         let circleCenterPoint = this.circleCenterPoint;
         let html              = "<g>";
         this.list.map(item => {
-            let x = item.x == circleCenterPoint.x ? item.x : false;
-            let y = item.y == circleCenterPoint.y ? item.y + 10 : false;
-            if (!x) x = item.x > circleCenterPoint.x ? (item.x + this.getResponseVar(50)) : (item.x - this.getResponseVar(60));
-            if (!y) y = item.y > circleCenterPoint.y ? (item.y + this.getResponseVar(60)) : (item.y - this.getResponseVar(30));
+            let x = item.vx == circleCenterPoint.x ? item.vx : false;
+            let y = item.vy == circleCenterPoint.y ? item.vy + 10 : false;
+            if (!x) x = item.vx > circleCenterPoint.x ? (item.vx + this.getResponseVar(50)) : (item.vx - this.getResponseVar(60));
+            if (!y) y = item.vy > circleCenterPoint.y ? (item.vy + this.getResponseVar(60)) : (item.vy - this.getResponseVar(30));
             html += `<text style="fill:black;"><tspan x="${x - this.getResponseVar(20)}" y="${y - this.getResponseVar(20)}" style="font-size:${this.getResponseVar(this.titleSize)}px">${item.title}</tspan><tspan style="fill:#999;font-size:${this.getResponseVar(this.contentSize)}px" x="${x - this.getResponseVar(20)}" y="${y + this.getResponseVar(5)}">${item.content}</tspan></text>`;
         });
         html += '</g>';
@@ -90,30 +98,52 @@ class DrawSvg {
             let maxAngle  = index * angle;
             // 真实的长度
             item.distance = item.distance * 1 * r;
+            // 虚拟长度(distance=1)
+            // virtualDistance = 1;
+            // 第一个json是传进来的值,画真实的形状,第二个json是虚拟形状,当图形铺满是什么形状,能够对比
+            let keyList   = [{
+                key     : 'distance',
+                x       : 'x',
+                y       : 'y',
+                distance: item.distance
+            }, {
+                key     : 'r',
+                x       : 'vx',
+                y       : 'vy',
+                distance: r
+            }];
             // 这四个角度判断...我也在想办法..优化!!
             // 当张角小于90度
             if (maxAngle <= 90) {
                 maxAngle = maxAngle * Math.PI / 180;
-                item.x   = circleCenterPoint.x + Math.round(Math.sin(maxAngle) * item.distance);
-                item.y   = circleCenterPoint.y - Math.round(Math.cos(maxAngle) * item.distance);
+                keyList.map(listItem => {
+                    item[listItem.x] = circleCenterPoint.x + Math.round(Math.sin(maxAngle) * listItem.distance);
+                    item[listItem.y] = circleCenterPoint.y - Math.round(Math.cos(maxAngle) * listItem.distance);
+                });
             }
             // 当张角 大于 90度 小于 180度
             if (maxAngle > 90 && maxAngle <= 180) {
                 maxAngle = (maxAngle - 90) * Math.PI / 180;
-                item.y   = circleCenterPoint.y + Math.round(Math.sin(maxAngle) * item.distance);
-                item.x   = circleCenterPoint.x + Math.round(Math.cos(maxAngle) * item.distance);
+                keyList.map(listItem => {
+                    item[listItem.x] = circleCenterPoint.x + Math.round(Math.cos(maxAngle) * listItem.distance);
+                    item[listItem.y] = circleCenterPoint.y + Math.round(Math.sin(maxAngle) * listItem.distance);
+                });
             }
             // 当张角 大于 180 小于 270
             if (maxAngle > 180 && maxAngle <= 270) {
                 maxAngle = (maxAngle - 180) * Math.PI / 180;
-                item.y   = circleCenterPoint.y + Math.round(Math.cos(maxAngle) * item.distance);
-                item.x   = circleCenterPoint.x - Math.round(Math.sin(maxAngle) * item.distance);
+                keyList.map(listItem => {
+                    item[listItem.x] = circleCenterPoint.x - Math.round(Math.sin(maxAngle) * listItem.distance);
+                    item[listItem.y] = circleCenterPoint.y + Math.round(Math.cos(maxAngle) * listItem.distance);
+                });
             }
             // 当张角 大于 270 小于 360
             if (maxAngle > 270 && maxAngle <= 360) {
                 maxAngle = (maxAngle - 270) * Math.PI / 180;
-                item.y   = circleCenterPoint.y - Math.round(Math.sin(maxAngle) * item.distance);
-                item.x   = circleCenterPoint.x - Math.round(Math.cos(maxAngle) * item.distance);
+                keyList.map(listItem => {
+                    item[listItem.x] = circleCenterPoint.x - Math.round(Math.cos(maxAngle) * listItem.distance);
+                    item[listItem.y] = circleCenterPoint.y - Math.round(Math.sin(maxAngle) * listItem.distance);
+                });
             }
             return item;
         })
@@ -123,10 +153,12 @@ class DrawSvg {
      * 创建 svg, 画svg
      */
     initGraphic() {
-        let positionStr = '';
+        let positionStr  = '';
+        let vPositionStr = '';
         this.list.map(item => {
             positionStr += `${item.x},${item.y} `;
+            vPositionStr += `${item.vx},${item.vy} `;
         });
-        this.svg = $(`<svg width="${this.width}" height="${this.height}"><polygon points="${positionStr}" style="fill:#A4DAFF; stroke:#73A7FE; stroke-width:2"></polygon></svg>`);
+        this.svg = $(`<svg width="${this.width}" height="${this.height}"><polygon points="${vPositionStr}" style="fill:none; stroke:#e4e4e4; stroke-width:2"></polygon><polygon points="${positionStr}" style="fill:#A4DAFF; stroke:#73A7FE; stroke-width:2"></polygon></svg>`);
     }
 }

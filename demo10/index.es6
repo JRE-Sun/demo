@@ -27,32 +27,19 @@ $(document).ready(() => {
             }, {
                 title   : '发布',
                 content : '第25名',
+                distance: .8,
+            }, {
+                title   : '发布',
+                content : '第5名',
+                distance: .79,
+            }, {
+                title   : '发布',
+                content : '第25名',
                 distance: 1,
             }, {
                 title   : '发布',
                 content : '第5名',
-                distance: 1,
-            }, {
-                title   : '发布',
-                content : '第35名',
-                distance: 1,
-            },{
-                title   : '发布',
-                content : '第543名',
-                distance: 1,
-            },{
-                title   : '发布',
-                content : '第588名',
-                distance: 1,
-            },
-            {
-                title   : '发布',
-                content : '第543名',
-                distance: 1,
-            },{
-                title   : '发布',
-                content : '第588名',
-                distance: 1,
+                distance: .6,
             },
         ]
     });
