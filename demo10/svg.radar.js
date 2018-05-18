@@ -1,5 +1,7 @@
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -7,7 +9,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 /**
  * 画svg
  */
-var DrawSvg = function () {
+var SvgRadar = function () {
     /**
      *
      * @param width   svg 宽
@@ -17,14 +19,28 @@ var DrawSvg = function () {
      * @param titleSize  title文字字号
      * @param contentSize  content文字字号
      */
-    function DrawSvg() {
+    function SvgRadar() {
         var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+            _ref$vertex = _ref.vertex,
+            vertex = _ref$vertex === undefined ? true : _ref$vertex,
             _ref$width = _ref.width,
             width = _ref$width === undefined ? 500 : _ref$width,
+            _ref$targetG = _ref.targetG,
+            targetG = _ref$targetG === undefined ? null : _ref$targetG,
             _ref$height = _ref.height,
             height = _ref$height === undefined ? 500 : _ref$height,
+            _ref$dottedLine = _ref.dottedLine,
+            dottedLine = _ref$dottedLine === undefined ? '#8dc0e3' : _ref$dottedLine,
             _ref$r = _ref.r,
             r = _ref$r === undefined ? 175 : _ref$r,
+            _ref$titleColor = _ref.titleColor,
+            titleColor = _ref$titleColor === undefined ? '#000' : _ref$titleColor,
+            _ref$contentColor = _ref.contentColor,
+            contentColor = _ref$contentColor === undefined ? '#999' : _ref$contentColor,
+            _ref$selector = _ref.selector,
+            selector = _ref$selector === undefined ? 'body' : _ref$selector,
+            _ref$virtual = _ref.virtual,
+            virtual = _ref$virtual === undefined ? true : _ref$virtual,
             _ref$list = _ref.list,
             list = _ref$list === undefined ? null : _ref$list,
             _ref$titleSize = _ref.titleSize,
@@ -32,7 +48,7 @@ var DrawSvg = function () {
             _ref$contentSize = _ref.contentSize,
             contentSize = _ref$contentSize === undefined ? 16 : _ref$contentSize;
 
-        _classCallCheck(this, DrawSvg);
+        _classCallCheck(this, SvgRadar);
 
         if (list == null) return;
         this.list = list; // 存储的是坐标数据
@@ -40,12 +56,44 @@ var DrawSvg = function () {
         this.height = height; // svg的高
         this.r = r; // 圆的半径
         this.titleSize = titleSize;
+        this.selector = selector; // 默认插入到body上
         this.contentSize = contentSize;
+        this.contentColor = contentColor;
+        this.titleColor = titleColor;
+        this.dottedLine = dottedLine; // 虚线颜色,当为false,不显示
+
+        // 虚拟边框的样式,以后可能扩展
+        var defaultVirtual = {
+            borderColor: '#F4F4F4',
+            width: 2,
+            fill: 'none'
+        };
+
+        if (virtual == true) virtual = defaultVirtual;
+        if ((typeof virtual === 'undefined' ? 'undefined' : _typeof(virtual)) == 'object') {
+            virtual = Object.assign(defaultVirtual, virtual);
+        }
+
+        console.log(virtual);
+
+        this.virtual = virtual; // 是否显示虚拟的 对比边框
+        this.targetG = targetG == null ? function () {
+            return {
+                fillColor: '#A4DAFF',
+                borderColor: '#73A7FE'
+            };
+        }() : targetG;
+        this.vertex = vertex == null ? function () {
+            return {
+                width: 2,
+                color: '#333',
+                r: 2
+            };
+        }() : vertex;
         this.init();
-        console.log(this);
     }
 
-    _createClass(DrawSvg, [{
+    _createClass(SvgRadar, [{
         key: 'init',
         value: function init() {
             this.screenWidth = $(window).width();
@@ -76,16 +124,18 @@ var DrawSvg = function () {
             this.initDotLinRound();
             // 画文字
             this.initText();
-            $('body').append(this.svg);
+            $(this.selector).append(this.svg);
         }
     }, {
         key: 'initDotLinRound',
         value: function initDotLinRound() {
             var circleCenterPoint = this.circleCenterPoint;
-            var html = "<g fill='none' stroke='#8dc0e3' stroke-width='1'>";
+            var dottedLine = this.dottedLine;
+            var vertex = this.vertex;
+            var html = '<g fill=\'none\' stroke=\'' + dottedLine + '\' stroke-width=\'1\'>';
             this.list.map(function (item) {
-                html += '<path stroke-dasharray="5,5" d="M' + item.vx + ',' + item.vy + ' ' + circleCenterPoint.x + ',' + circleCenterPoint.y + '"></path>';
-                html += '<circle cx="' + item.x + '" cy="' + item.y + '" r="2" stroke="black" stroke-width="2" fill="#fff"></circle>';
+                if (dottedLine) html += '<path stroke-dasharray="5,5" d="M' + item.vx + ',' + item.vy + ' ' + circleCenterPoint.x + ',' + circleCenterPoint.y + '"></path>';
+                if (vertex) html += '<circle cx="' + item.x + '" cy="' + item.y + '" r="' + vertex.r + '" stroke="' + vertex.color + '" stroke-width="' + vertex.width + '" fill="#fff"></circle>';
             });
             html += '</g>';
             this.svg[0].innerHTML = this.svg[0].innerHTML + html;
@@ -108,11 +158,28 @@ var DrawSvg = function () {
             var circleCenterPoint = this.circleCenterPoint;
             var html = "<g>";
             this.list.map(function (item) {
+                var contentTextStatus = !(typeof item.content == 'undefined' || item.content == '');
+                var position = [];
+                if (contentTextStatus) {
+                    position[0] = 50;
+                    position[1] = 60;
+                    position[2] = 60;
+                    position[3] = 30;
+                } else {
+                    position[0] = 30;
+                    position[1] = 40;
+                    position[2] = 60;
+                    position[3] = 10;
+                }
                 var x = item.vx == circleCenterPoint.x ? item.vx : false;
                 var y = item.vy == circleCenterPoint.y ? item.vy + 10 : false;
-                if (!x) x = item.vx > circleCenterPoint.x ? item.vx + _this.getResponseVar(50) : item.vx - _this.getResponseVar(60);
-                if (!y) y = item.vy > circleCenterPoint.y ? item.vy + _this.getResponseVar(60) : item.vy - _this.getResponseVar(30);
-                html += '<text style="fill:black;"><tspan x="' + (x - _this.getResponseVar(20)) + '" y="' + (y - _this.getResponseVar(20)) + '" style="font-size:' + _this.getResponseVar(_this.titleSize) + 'px">' + item.title + '</tspan><tspan style="fill:#999;font-size:' + _this.getResponseVar(_this.contentSize) + 'px" x="' + (x - _this.getResponseVar(20)) + '" y="' + (y + _this.getResponseVar(5)) + '">' + item.content + '</tspan></text>';
+                if (!x) x = item.vx > circleCenterPoint.x ? item.vx + _this.getResponseVar(position[0]) : item.vx - _this.getResponseVar(position[1]);
+                if (!y) y = item.vy > circleCenterPoint.y ? item.vy + _this.getResponseVar(position[2]) : item.vy - _this.getResponseVar(position[3]);
+                html += '<text style="fill:' + _this.titleColor + ';"><tspan color="transparent" x="' + (x - _this.getResponseVar(_this.titleSize)) + '" y="' + (y - _this.getResponseVar(_this.titleSize / 2)) + '" style="font-size:' + _this.getResponseVar(_this.titleSize) + 'px">' + item.title + '</tspan>';
+                if (contentTextStatus) {
+                    html += '<tspan style="fill:' + _this.contentColor + ';font-size:' + _this.getResponseVar(_this.contentSize) + 'px" x="' + (x - _this.getResponseVar(20)) + '" y="' + (y + _this.getResponseVar(5)) + '">' + item.content + '</tspan>';
+                }
+                html += '</text>';
             });
             html += '</g>';
             this.svg[0].innerHTML = this.svg[0].innerHTML + html;
@@ -125,6 +192,8 @@ var DrawSvg = function () {
     }, {
         key: 'initList',
         value: function initList() {
+            var _this2 = this;
+
             var r = this.r;
             var angle = this.angle;
             var circleCenterPoint = this.circleCenterPoint;
@@ -144,7 +213,7 @@ var DrawSvg = function () {
                     key: 'r',
                     x: 'vx',
                     y: 'vy',
-                    distance: r
+                    distance: _this2.virtual ? r : item.distance
                 }];
                 // 这四个角度判断...我也在想办法..优化!!
                 // 当张角小于90度
@@ -196,9 +265,13 @@ var DrawSvg = function () {
                 positionStr += item.x + ',' + item.y + ' ';
                 vPositionStr += item.vx + ',' + item.vy + ' ';
             });
-            this.svg = $('<svg width="' + this.width + '" height="' + this.height + '"><polygon points="' + vPositionStr + '" style="fill:none; stroke:#e4e4e4; stroke-width:2"></polygon><polygon points="' + positionStr + '" style="fill:#A4DAFF; stroke:#73A7FE; stroke-width:2"></polygon></svg>');
+            var html = '<polygon points="' + positionStr + '" style="fill:' + this.targetG.fillColor + '; stroke:' + this.targetG.borderColor + '; stroke-width:2"></polygon>';
+            if (this.virtual) {
+                html += '<polygon points="' + vPositionStr + '" style="fill:' + this.virtual.fill + '; stroke:' + this.virtual.borderColor + '; stroke-width:' + this.virtual.width + '"></polygon>';
+            }
+            this.svg = $('<svg width="' + this.width + '" height="' + this.height + '">' + html + '</svg>');
         }
     }]);
 
-    return DrawSvg;
+    return SvgRadar;
 }();

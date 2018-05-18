@@ -11,7 +11,7 @@ class DrawSvg {
      * @param titleSize  title文字字号
      * @param contentSize  content文字字号
      */
-    constructor({width = 500, height = 500, r = 175, list = null, titleSize = 20, contentSize = 16} = {}) {
+    constructor({width = 500, height = 500, r = 175, virtual = true, list = null, titleSize = 20, contentSize = 16} = {}) {
         if (list == null) return;
         this.list        = list; // 存储的是坐标数据
         this.width       = width; // svg的宽
@@ -19,8 +19,8 @@ class DrawSvg {
         this.r           = r; // 圆的半径
         this.titleSize   = titleSize;
         this.contentSize = contentSize;
+        this.virtual     = virtual; // 是否显示虚拟的 对比边框
         this.init();
-        console.log(this);
     }
 
     init() {
@@ -81,7 +81,11 @@ class DrawSvg {
             let y = item.vy == circleCenterPoint.y ? item.vy + 10 : false;
             if (!x) x = item.vx > circleCenterPoint.x ? (item.vx + this.getResponseVar(50)) : (item.vx - this.getResponseVar(60));
             if (!y) y = item.vy > circleCenterPoint.y ? (item.vy + this.getResponseVar(60)) : (item.vy - this.getResponseVar(30));
-            html += `<text style="fill:black;"><tspan x="${x - this.getResponseVar(20)}" y="${y - this.getResponseVar(20)}" style="font-size:${this.getResponseVar(this.titleSize)}px">${item.title}</tspan><tspan style="fill:#999;font-size:${this.getResponseVar(this.contentSize)}px" x="${x - this.getResponseVar(20)}" y="${y + this.getResponseVar(5)}">${item.content}</tspan></text>`;
+            html += `<text style="fill:black;"><tspan x="${x - this.getResponseVar(20)}" y="${y - this.getResponseVar(20)}" style="font-size:${this.getResponseVar(this.titleSize)}px">${item.title}</tspan>`;
+            if (!(typeof item.content == 'undefined' || item.content == '')) {
+                html += `<tspan style="fill:#999;font-size:${this.getResponseVar(this.contentSize)}px" x="${x - this.getResponseVar(20)}" y="${y + this.getResponseVar(5)}">${item.content}</tspan>`;
+            }
+            html += `</text>`;
         });
         html += '</g>';
         this.svg[0].innerHTML = this.svg[0].innerHTML + html;
@@ -101,7 +105,7 @@ class DrawSvg {
             // 虚拟长度(distance=1)
             // virtualDistance = 1;
             // 第一个json是传进来的值,画真实的形状,第二个json是虚拟形状,当图形铺满是什么形状,能够对比
-            let keyList   = [{
+            let keyList = [{
                 key     : 'distance',
                 x       : 'x',
                 y       : 'y',
@@ -110,7 +114,7 @@ class DrawSvg {
                 key     : 'r',
                 x       : 'vx',
                 y       : 'vy',
-                distance: r
+                distance: this.virtual ? r : item.distance,
             }];
             // 这四个角度判断...我也在想办法..优化!!
             // 当张角小于90度
@@ -159,6 +163,10 @@ class DrawSvg {
             positionStr += `${item.x},${item.y} `;
             vPositionStr += `${item.vx},${item.vy} `;
         });
-        this.svg = $(`<svg width="${this.width}" height="${this.height}"><polygon points="${vPositionStr}" style="fill:none; stroke:#e4e4e4; stroke-width:2"></polygon><polygon points="${positionStr}" style="fill:#A4DAFF; stroke:#73A7FE; stroke-width:2"></polygon></svg>`);
+        let html = `<polygon points="${positionStr}" style="fill:#A4DAFF; stroke:#73A7FE; stroke-width:2"></polygon>`;
+        if (this.virtual) {
+            html += `<polygon points="${vPositionStr}" style="fill:none; stroke:#E4E4E4; stroke-width:2"></polygon>`;
+        }
+        this.svg = $(`<svg width="${this.width}" height="${this.height}">` + html + `</svg>`);
     }
 }
