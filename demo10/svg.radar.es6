@@ -1,7 +1,7 @@
 /**
  * 画svg
  */
-class DrawSvg {
+class SvgRadar {
     /**
      *
      * @param width   svg 宽
@@ -11,15 +11,47 @@ class DrawSvg {
      * @param titleSize  title文字字号
      * @param contentSize  content文字字号
      */
-    constructor({width = 500, height = 500, r = 175, virtual = true, list = null, titleSize = 20, contentSize = 16} = {}) {
+    constructor({vertex = true, width = 500, targetG = null, height = 500, dottedLine = '#8dc0e3', r = 175, titleColor = '#000', contentColor = '#999', selector = 'body', virtual = true, list = null, titleSize = 20, contentSize = 16} = {}) {
         if (list == null) return;
-        this.list        = list; // 存储的是坐标数据
-        this.width       = width; // svg的宽
-        this.height      = height; // svg的高
-        this.r           = r; // 圆的半径
-        this.titleSize   = titleSize;
-        this.contentSize = contentSize;
-        this.virtual     = virtual; // 是否显示虚拟的 对比边框
+        this.list         = list; // 存储的是坐标数据
+        this.width        = width; // svg的宽
+        this.height       = height; // svg的高
+        this.r            = r; // 圆的半径
+        this.titleSize    = titleSize;
+        this.selector     = selector; // 默认插入到body上
+        this.contentSize  = contentSize;
+        this.contentColor = contentColor;
+        this.titleColor   = titleColor;
+        this.dottedLine   = dottedLine; // 虚线颜色,当为false,不显示
+
+        // 虚拟边框的样式,以后可能扩展
+        var defaultVirtual = {
+            borderColor: '#F4F4F4',
+            width      : 2,
+            fill       : 'none'
+        };
+
+        if (virtual == true) virtual = defaultVirtual;
+        if (typeof virtual == 'object') {
+            virtual = Object.assign(defaultVirtual, virtual)
+        }
+
+        console.log(virtual);
+
+        this.virtual = virtual; // 是否显示虚拟的 对比边框
+        this.targetG = targetG == null ? (() => {
+            return {
+                fillColor  : '#A4DAFF',
+                borderColor: '#73A7FE'
+            }
+        })() : targetG;
+        this.vertex  = vertex == null ? (() => {
+            return {
+                width: 2,
+                color: '#333',
+                r    : 2,
+            }
+        })() : vertex;
         this.init();
     }
 
@@ -52,15 +84,17 @@ class DrawSvg {
         this.initDotLinRound();
         // 画文字
         this.initText();
-        $('body').append(this.svg);
+        $(this.selector).append(this.svg);
     }
 
     initDotLinRound() {
         let circleCenterPoint = this.circleCenterPoint;
-        let html              = "<g fill='none' stroke='#8dc0e3' stroke-width='1'>";
+        let dottedLine        = this.dottedLine;
+        let vertex            = this.vertex;
+        let html              = `<g fill='none' stroke='${dottedLine}' stroke-width='1'>`;
         this.list.map(item => {
-            html += `<path stroke-dasharray="5,5" d="M${item.vx},${item.vy} ${circleCenterPoint.x},${circleCenterPoint.y}"></path>`;
-            html += `<circle cx="${item.x}" cy="${item.y}" r="2" stroke="black" stroke-width="2" fill="#fff"></circle>`;
+            if (dottedLine) html += `<path stroke-dasharray="5,5" d="M${item.vx},${item.vy} ${circleCenterPoint.x},${circleCenterPoint.y}"></path>`;
+            if (vertex) html += `<circle cx="${item.x}" cy="${item.y}" r="${vertex.r}" stroke="${vertex.color}" stroke-width="${vertex.width}" fill="#fff"></circle>`;
         });
         html += '</g>';
         this.svg[0].innerHTML = this.svg[0].innerHTML + html;
@@ -77,13 +111,26 @@ class DrawSvg {
         let circleCenterPoint = this.circleCenterPoint;
         let html              = "<g>";
         this.list.map(item => {
+            let contentTextStatus = !(typeof item.content == 'undefined' || item.content == '');
+            let position          = [];
+            if (contentTextStatus) {
+                position[0] = 50;
+                position[1] = 60;
+                position[2] = 60;
+                position[3] = 30;
+            } else {
+                position[0] = 30;
+                position[1] = 40;
+                position[2] = 60;
+                position[3] = 10;
+            }
             let x = item.vx == circleCenterPoint.x ? item.vx : false;
             let y = item.vy == circleCenterPoint.y ? item.vy + 10 : false;
-            if (!x) x = item.vx > circleCenterPoint.x ? (item.vx + this.getResponseVar(50)) : (item.vx - this.getResponseVar(60));
-            if (!y) y = item.vy > circleCenterPoint.y ? (item.vy + this.getResponseVar(60)) : (item.vy - this.getResponseVar(30));
-            html += `<text style="fill:black;"><tspan x="${x - this.getResponseVar(20)}" y="${y - this.getResponseVar(20)}" style="font-size:${this.getResponseVar(this.titleSize)}px">${item.title}</tspan>`;
-            if (!(typeof item.content == 'undefined' || item.content == '')) {
-                html += `<tspan style="fill:#999;font-size:${this.getResponseVar(this.contentSize)}px" x="${x - this.getResponseVar(20)}" y="${y + this.getResponseVar(5)}">${item.content}</tspan>`;
+            if (!x) x = item.vx > circleCenterPoint.x ? (item.vx + this.getResponseVar(position[0])) : (item.vx - this.getResponseVar(position[1]));
+            if (!y) y = item.vy > circleCenterPoint.y ? (item.vy + this.getResponseVar(position[2])) : (item.vy - this.getResponseVar(position[3]));
+            html += `<text style="fill:${this.titleColor};"><tspan color="transparent" x="${x - this.getResponseVar(this.titleSize)}" y="${y - this.getResponseVar(this.titleSize / 2)}" style="font-size:${this.getResponseVar(this.titleSize)}px">${item.title}</tspan>`;
+            if (contentTextStatus) {
+                html += `<tspan style="fill:${this.contentColor};font-size:${this.getResponseVar(this.contentSize)}px" x="${x - this.getResponseVar(20)}" y="${y + this.getResponseVar(5)}">${item.content}</tspan>`;
             }
             html += `</text>`;
         });
@@ -163,9 +210,9 @@ class DrawSvg {
             positionStr += `${item.x},${item.y} `;
             vPositionStr += `${item.vx},${item.vy} `;
         });
-        let html = `<polygon points="${positionStr}" style="fill:#A4DAFF; stroke:#73A7FE; stroke-width:2"></polygon>`;
+        let html = `<polygon points="${positionStr}" style="fill:${this.targetG.fillColor}; stroke:${this.targetG.borderColor}; stroke-width:2"></polygon>`;
         if (this.virtual) {
-            html += `<polygon points="${vPositionStr}" style="fill:none; stroke:#E4E4E4; stroke-width:2"></polygon>`;
+            html += `<polygon points="${vPositionStr}" style="fill:${this.virtual.fill}; stroke:${this.virtual.borderColor}; stroke-width:${this.virtual.width}"></polygon>`;
         }
         this.svg = $(`<svg width="${this.width}" height="${this.height}">` + html + `</svg>`);
     }
