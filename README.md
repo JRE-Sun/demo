@@ -8,4 +8,4 @@
 8. demo8->给定数字,实现滚动到该数字效果
 9. demo9->捡取页面特殊img元素,形成画廊
 10. demo10->画一个svg 
-11. demo11->通过svg实现一个loading(需要优化)
+11. demo11->通过svg实现一个loading(需要化)
