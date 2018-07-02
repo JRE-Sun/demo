@@ -1,14 +1,15 @@
 $(document).ready(() => {
-    // 纯dom彩蛋!
-    new PullToRefresh({
-        mainDom     : 'body',
-        pullStartDom: `<div class="vertical-center"><img src="https://c1.zcimg.com/static/index/img/g.png"
-    alt=""><p>由掌圈提供技术支持</p></div>`,
-    });
+    // // 纯dom彩蛋!
+    // new PullToRefresh({
+    //     mainDom     : 'body',
+    //     pullStartDom: `<div class="vertical-center"><img src="https://c1.zcimg.com/static/index/img/g.png"
+    // alt=""><p>由掌圈提供技术支持</p></div>`,
+    // });
 
     // 执行下拉刷新
     new PullToRefresh({
-        mainDom     : '.main',
+        mainDom     : 'body',
+
         pullStartDom: `<span>下拉加载</span>`,
         pullEndDom  : `<span>加载中...</span>`,
         pullCallBack: (pull) => {

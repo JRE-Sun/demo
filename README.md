@@ -10,3 +10,8 @@
 10. demo10->画一个svg 
 11. demo11->通过svg实现一个loading(需要优化)
 12. demo12->初探观察者模式
+13. demo13->地图
+14. demo14->倒计时
+15. demo15->三种loading
+16. demo16->表单缓存
+17. demo17->更多搜索

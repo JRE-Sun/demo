@@ -11,9 +11,13 @@ var PullToRefresh = function () {
     function PullToRefresh() {
         var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
             _ref$pullStartDom = _ref.pullStartDom,
-            pullStartDom = _ref$pullStartDom === undefined ? null : _ref$pullStartDom,
+            pullStartDom = _ref$pullStartDom === undefined ? '' : _ref$pullStartDom,
+            _ref$pullDownMaxDis = _ref.pullDownMaxDis,
+            pullDownMaxDis = _ref$pullDownMaxDis === undefined ? false : _ref$pullDownMaxDis,
+            _ref$removeMouseEvent = _ref.removeMouseEvent,
+            removeMouseEvent = _ref$removeMouseEvent === undefined ? true : _ref$removeMouseEvent,
             _ref$pullEndDom = _ref.pullEndDom,
-            pullEndDom = _ref$pullEndDom === undefined ? null : _ref$pullEndDom,
+            pullEndDom = _ref$pullEndDom === undefined ? '' : _ref$pullEndDom,
             _ref$mainDom = _ref.mainDom,
             mainDom = _ref$mainDom === undefined ? null : _ref$mainDom,
             _ref$pullCallBack = _ref.pullCallBack,
@@ -29,6 +33,9 @@ var PullToRefresh = function () {
         this.mainDom = mainDom && $(mainDom);
         this.pullEndDom = pullEndDom;
         this.pullStartDom = pullStartDom;
+        // 下拉的最大距离
+        this.pullDownMaxDis = pullDownMaxDis;
+        this.removeMouseEvent = removeMouseEvent;
         this.init();
     }
 
@@ -36,8 +43,8 @@ var PullToRefresh = function () {
         key: 'init',
         value: function init() {
             this.screenHeight = $(window).height();
-            this.maxMoveDis = Math.ceil(this.screenHeight / 4);
-            this.pullDom = $('<div class="pull-start"></div>');
+            this.maxMoveDis = !this.pullDownMaxDis ? Math.ceil(this.screenHeight / 4) : this.pullDownMaxDis;
+            this.pullDom = $('<div class="pull-down"></div>');
             this.pullDom.css({
                 position: 'absolute',
                 top: 0,
@@ -47,12 +54,30 @@ var PullToRefresh = function () {
                 height: this.maxMoveDis + 'px',
                 transform: 'translateY(-100%)'
             });
+            this.pullStartDom = '<div class="pull-start">' + this.pullStartDom + '</div>';
+            this.pullEndDom = '<div class="pull-end">' + this.pullEndDom + '</div>';
             this.pullDom.html(this.pullStartDom);
             this.transitonTime = 0.2; // 默认transtion
             this.direction = ''; // 两个值up,down,
             this.startPosition = {};
             this.endPositon = {};
+            this.removeEvent();
             this.bindEvent();
+        }
+
+        /**
+         * 默认移除鼠标滚轮事件
+         */
+
+    }, {
+        key: 'removeEvent',
+        value: function removeEvent() {
+            if (!this.removeMouseEvent) return;
+            $(document).on('mousewheel', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                return false;
+            });
         }
 
         /**
@@ -83,8 +108,10 @@ var PullToRefresh = function () {
             });
             this.transitionCallBack(function () {
                 // $(this.pullDom).remove();
+                console.log(11);
                 _this.pullDom.html(_this.pullStartDom);
                 mainDom.css({
+                    'transform': 'none',
                     'transition': '0s'
                 });
             });
@@ -97,13 +124,16 @@ var PullToRefresh = function () {
             var isTouchStart = false;
             var mainDom = this.mainDom;
             var maxMoveDis = this.maxMoveDis;
+            var direction = '';
             var moveDistance = 0;
+            var translateYPX = 0;
             var isAlreadyPull = false; // 是否已经执行过下拉
             $(document).on('touchstart', function (e) {
                 if ($(window).scrollTop() == 0) {
                     e.preventDefault();
                     e.stopPropagation();
-                    _this2.direction = 'up';
+                    translateYPX = mainDom.css('transform');
+                    translateYPX = translateYPX.replace(/[a-zA-Z\(\)]/ig, '') * 1;
                     var touch = e.touches[0];
                     _this2.startPosition.x = touch.pageX;
                     _this2.startPosition.y = touch.pageY;
@@ -115,13 +145,18 @@ var PullToRefresh = function () {
                 var touch = e.touches[0];
                 _this2.endPositon.x = touch.pageX;
                 _this2.endPositon.y = touch.pageY;
-                moveDistance = Math.ceil(_this2.endPositon.y - _this2.startPosition.y);
+                moveDistance = _this2.endPositon.y - _this2.startPosition.y;
+                direction = moveDistance < 0 ? 'up' : 'down';
+                moveDistance = Math.ceil(moveDistance);
+                moveDistance += translateYPX;
+                if (_this2.direction == 'down' && direction == 'down' && moveDistance >= maxMoveDis) return;
                 if (moveDistance > 0) {
                     !isAlreadyPull && mainDom.prepend(_this2.pullDom);
                     isAlreadyPull = true;
                     if (moveDistance >= maxMoveDis) {
+                        _this2.direction = 'down';
                         moveDistance = maxMoveDis;
-                        _this2.pullEndDom && _this2.pullDom.html(_this2.pullEndDom);
+                        $('.pull-down .pull-end').length > 0 && _this2.pullEndDom && _this2.pullDom.html(_this2.pullEndDom);
                     }
                     mainDom.css({
                         'transform': 'translateY(' + moveDistance + 'px)'
@@ -131,11 +166,15 @@ var PullToRefresh = function () {
             $(document).on('touchend', function () {
                 if (!isTouchStart) return;
                 // 当全部拉出才执行 回调
-                if (moveDistance == maxMoveDis && _this2.pullCallBack) {
+                if (_this2.direction == 'down' && moveDistance >= maxMoveDis && _this2.pullCallBack) {
                     _this2.pullCallBack(_this2);
                 } else {
                     _this2.pullHide();
                 }
+                // 清空状态
+                _this2.direction == '';
+                direction == '';
+                moveDistance = 0;
                 isTouchStart = false;
             });
         }

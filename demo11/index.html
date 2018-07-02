@@ -31,6 +31,20 @@
             text-align: center;
             font-size: 100px;
         }
+        br{
+            background: red;
+            display: block;
+            width: 100%;
+            height: 200px;
+            position: relative;
+        }
+        br:before{
+            position: absolute;
+            width: 100%;
+            height: 100px;
+            content: '';
+            background: red;
+        }
     </style>
 </head>
 <body>
@@ -56,6 +70,10 @@
         </g>
     </svg>
     <span id="timeSecond" class="time-second"></span>
+</div>
+<div>
+    <p>sdsdsd</p>
+    <br/>
 </div>
 <script>
     console.log(2 * Math.PI * 170);

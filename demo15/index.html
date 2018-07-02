@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        background: #000;
+    }
+
+    /* 第一种开始 */
+
+    .spinner-wrap {
+        top: 80px;
+        margin: auto;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .spinner {
+        height: 100px;
+        width: 100px;
+        display: inline-block;
+        margin: -50px auto 0;
+        animation: spin 1s steps(12, end) infinite;
+    }
+
+    .spinner:first-child {
+        margin-right: 50px;
+    }
+
+    i {
+        height: 30px;
+        width: 6px;
+        margin-left: -3px;
+        display: block;
+        transition: height 1s;
+        position: absolute;
+        left: 50%;
+        transform-origin: center 50px;
+        background: #fff;
+        box-shadow: 0 0 3px rgba(255, 255, 255, 0.7);
+        border-radius: 3px;
+    }
+
+    .spinner:hover i {
+        height: 6px;
+    }
+
+    .spinner:hover i:nth-child(2) i {
+        height: 30px;
+    }
+
+    .spinner i:nth-child(1) {
+        opacity: 0.08;
+    }
+
+    .spinner i:nth-child(2) {
+        transform: rotate(30deg);
+        opacity: 0.167;
+    }
+
+    .spinner i:nth-child(3) {
+        transform: rotate(60deg);
+        opacity: 0.25;
+    }
+
+    .spinner i:nth-child(4) {
+        transform: rotate(90deg);
+        opacity: 0.33;
+    }
+
+    .spinner i:nth-child(5) {
+        transform: rotate(120deg);
+        opacity: 0.4167;
+    }
+
+    .spinner i:nth-child(6) {
+        transform: rotate(150deg);
+        opacity: 0.5;
+    }
+
+    .spinner i:nth-child(7) {
+        transform: rotate(180deg);
+        opacity: 0.583;
+    }
+
+    .spinner i:nth-child(8) {
+        transform: rotate(210deg);
+        opacity: 0.67;
+    }
+
+    .spinner i:nth-child(9) {
+        transform: rotate(240deg);
+        opacity: 0.75;
+    }
+
+    .spinner i:nth-child(10) {
+        transform: rotate(270deg);
+        opacity: 0.833;
+    }
+
+    .spinner i:nth-child(11) {
+        transform: rotate(300deg);
+        opacity: 0.9167;
+    }
+
+    .spinner i:nth-child(12) {
+        transform: rotate(330deg);
+        opacity: 1;
+    }
+
+    /* 第一种结束 */
+
+    /* 第二种开始 */
+
+    .loading-wrap {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        /* background: orange; */
+        display: flex;
+        align-items: center;
+        color: #fff;
+    }
+
+    .loading-wrap span {
+        margin-right: 8px;
+        background: transparent;
+        border: 5px solid #eee;
+        width: 40px;
+        height: 40px;
+        display: block;
+        border-radius: 100%;
+        position: relative;
+        animation: .8s spin linear infinite;
+    }
+
+    .loading-wrap span:after {
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        border: 5px solid transparent;
+        border-top-color: red;
+        border-radius: 100%;
+        content: '';
+    }
+
+    /* 第二种结束 */
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<body>
+    <div class="spinner-wrap">
+        <div class="spinner">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+    </div>
+    <div class="loading-wrap"><span></span>加载中...</div>
+</body>
+
+</html>

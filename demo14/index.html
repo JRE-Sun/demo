@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>倒计时</title>
+</head>
+<body>
+<p></p>
+<form method="post" action="./">
+    <input type="number" oninput="this.value=this.value.replace(/[^0-9.]+/ig,'');" step="0.1">
+    <button type="submit">提交</button>
+</form>
+<script src="../lib/zepto.js"></script>
+<script src="index.js"></script>
+</body>
+</html>
